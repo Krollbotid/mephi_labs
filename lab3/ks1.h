@@ -6,8 +6,8 @@
 typedef struct KeySpace1 {
 	KeyType1 key;
 	KeyType1 par;
-	Item *info
+	Item *info;
 	KeySpace1 *next;
-}
+} KeySpace1;
 
 #endif

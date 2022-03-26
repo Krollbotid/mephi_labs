@@ -1,4 +1,10 @@
-#include <stdlib>
+#include <stdlib.h>
+#include "ks1.h"
+
+int ks1Delete (KeySpace1 *whom) {
+	free(whom);
+	return 0;
+}
 
 int ks1Insert(KeySpace1 *ks1, KeyType1 key, KeyType1 par, Item *info) {
 	if (!ks1 || !info || !key) {
@@ -8,7 +14,7 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 key, KeyType1 par, Item *info) {
 	int parfound = 0;
 	while (ptr->next) {
 		if (ptr->key == key) {
-			return 10; // ks1 restriction - no elements with the same keys
+			return 20; // ks1 restriction - no elements with the same keys
 		}
 		if (ptr->key == par) {
 			parfound = 1;
@@ -16,7 +22,7 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 key, KeyType1 par, Item *info) {
 		ptr = ptr->next;
 	}
 	if (!parfound && par) {
-		return 11; // ks1 restriction - element with parent key was not found
+		return 21; // ks1 restriction - element with parent key was not found
 	}
 	ptr->next = (KeySpace1*) malloc(sizeof(KeySpace1));
 	if (!(ptr->next)) {
@@ -27,10 +33,10 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 key, KeyType1 par, Item *info) {
 	ptr->par = par;
 	ptr->info = info;
 	ptr->next = NULL;
-	return 0; //success
+	return 0; // success
 }
 
-int ks1Search(KeySpace1 *ks1, KeyType1 key, KeySpace1 *ans) {
+int ks1Search(KeySpace1 *ks1, KeyType1 key, KeySpace1 **ans) {
 	if (!ks1 || !key) {
 		return 1;
 	}
@@ -38,18 +44,18 @@ int ks1Search(KeySpace1 *ks1, KeyType1 key, KeySpace1 *ans) {
 	while (key != ptr->key) {
 		ptr = ptr->next;
 		if (!ptr) {
-			return 404; //not found
+			return 404; // element not found
 		}
 	}
-	ans = ptr;
+	*ans = ptr;
 	return 0;
 }
 
-int ks1Delete(KeySpace1 *ks1, KeyType1 key) {
-	if (!ks1 || !key) {
+int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode) { // mode == 0 remove first release, otherwise all releases
+	if (!ks1 || !(*ks1) || !key) {
 		return 1;
 	}
-	KeySpace1 ptr = ks1, ptr_prev = NULL;
+	KeySpace1 *ptr = *ks1, *ptr_prev = NULL;
 	while (key != ptr->key) {
 		ptr_prev = ptr;
 		ptr = ptr->next;
@@ -57,5 +63,18 @@ int ks1Delete(KeySpace1 *ks1, KeyType1 key) {
 			return 404;
 		}
 	}
-	
+	if (ptr->info->next && !mode) {
+		*ans = ptr->info;
+		ptr->info = (*ans)->next;
+	} else {
+		if (ptr_prev) {
+			ptr_prev->next = ptr->next;
+			if (!ks1Delete(ptr)) {
+				return 22;
+			}
+		} else {
+			*ks1 = (*ks1)->next;
+		}
+	}
+	return 0;
 }

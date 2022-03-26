@@ -18,9 +18,7 @@ typedef struct Item {
 	KeyType1 key1;
 } Item;
 
-int InfoTypeDelete(InfoType *whom);
-int RelTypeDelete(RelType *whom);
-int KeyType1Delete(KeyType1 *whom);
 int ItemDelete(Item *whom);
+int ItemReleaseFixer(Item *first);
 
 #endif
