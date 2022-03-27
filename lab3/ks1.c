@@ -6,12 +6,31 @@ int ks1Delete (KeySpace1 *whom) {
 	return 0;
 }
 
+int ks1InitCreate (KeySpace1 **where) {
+	if (!where) {
+		return 1;
+	}
+	*where = (KeySpace1*) malloc(sizeof(KeySpace1));
+	if (!(*where)) {
+		return 2;
+	}
+	(*where)->info = NULL;
+	return 0;
+}
+
 int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 	if (!ks1 || !info || !(info->key1)) {
 		return 1; // zero in non-zero argument
 	}
 	KeyType1 key = info->key1;
 	KeySpace1 *ptr = ks1;
+	if (!(ks1->info)) {
+		ptr->key = key;
+		ptr->par = par;
+		ptr->info = info;
+		ptr->next = NULL;
+		return 0;
+	}
 	int parfound = 0;
 	while (ptr->next) {
 		if (ptr->key == key) {
@@ -77,11 +96,31 @@ int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode) { // mode == 
 	} else {
 		if (ptr_prev) {
 			ptr_prev->next = ptr->next;
-			if (!ks1Delete(ptr)) {
+			if (ks1Delete(ptr)) {
 				return 22;
 			}
 		} else {
 			*ks1 = (*ks1)->next;
+		}
+	}
+	return 0;
+}
+
+int ks1Clear(KeySpace1 *src, int mode) {// 0 clear only KeySpace1, not 0 clear also Items
+	if (!src) {
+		return 0;
+	}
+	KeySpace1 *ptr = src;
+	while (src->next) {
+		ptr = src;
+		src = src->next;
+		if (mode) {
+			if (ItemClear(ptr->info)) {
+				return 666;
+			}
+		}
+		if (ks1Delete(ptr)) {
+			return 666;
 		}
 	}
 	return 0;

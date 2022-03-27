@@ -10,4 +10,7 @@ typedef struct KeySpace1 {
 	KeySpace1 *next;
 } KeySpace1;
 
+int ks1InitCreate (KeySpace1 **where);
+int ks1Clear(KeySpace1 *src, int mode);
+
 #endif

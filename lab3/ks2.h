@@ -9,4 +9,7 @@ typedef struct KeySpace2 {
 	KeySpace2 *next;
 } KeySpace2;
 
+int ks2ArrCreate(int msize2, KeySpace2 **ans);
+int ks2Clear(KeySpace2 *src, int msize2, int mode);
+
 #endif

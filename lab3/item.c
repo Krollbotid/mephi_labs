@@ -17,7 +17,6 @@ int KeyType2Delete(KeyType2 *whom) {
 }
 
 int ItemDelete(Item *whom) {
-	int status = 0;
 	if (InfoTypeDelete(whom->info)) {
 		return 11;
 	}
@@ -29,6 +28,21 @@ int ItemDelete(Item *whom) {
 	}
 	if (KeyType2Delete(&(whom->key2))) {
 		return 14;
+	}
+	return 0;
+}
+
+int ItemClear(Item *src) {
+	if (!src) {
+		return 0;
+	}
+	Item *ptr = src;
+	while (src->next) {
+		ptr = src;
+		src = src->next;
+		if (ItemDelete(ptr)) {
+			return 666;
+		}
 	}
 	return 0;
 }
