@@ -10,15 +10,18 @@ typedef struct InfoType {
 
 typedef int RelType;
 typedef float KeyType1;
+typedef int KeyType2;
 
 typedef struct Item {
 	InfoType *info;
 	RelType release;
 	Item *next;
 	KeyType1 key1;
+	KeyType2 key2;
 } Item;
 
 int ItemDelete(Item *whom);
 int ItemReleaseFixer(Item *first);
+int ItemReleaseInsert(Item *first, Item *newitem);
 
 #endif

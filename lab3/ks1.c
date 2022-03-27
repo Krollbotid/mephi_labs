@@ -6,14 +6,22 @@ int ks1Delete (KeySpace1 *whom) {
 	return 0;
 }
 
-int ks1Insert(KeySpace1 *ks1, KeyType1 key, KeyType1 par, Item *info) {
-	if (!ks1 || !info || !key) {
+int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
+	if (!ks1 || !info || !(info->key1)) {
 		return 1; // zero in non-zero argument
 	}
+	KeyType1 key = info->key1;
 	KeySpace1 *ptr = ks1;
 	int parfound = 0;
 	while (ptr->next) {
 		if (ptr->key == key) {
+			if (ptr->info->key2 == info->key2) {
+				if (ptr->par == par) {
+                	*ans = ptr->info;
+					return 0;
+				}
+				return 23;
+			}
 			return 20; // ks1 restriction - no elements with the same keys
 		}
 		if (ptr->key == par) {

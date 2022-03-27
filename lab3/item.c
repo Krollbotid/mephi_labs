@@ -12,6 +12,10 @@ int KeyType1Delete(KeyType1 *whom) {
 	return 0;
 }
 
+int KeyType2Delete(KeyType2 *whom) {
+	return 0;
+}
+
 int ItemDelete(Item *whom) {
 	int status = 0;
 	if (InfoTypeDelete(whom->info)) {
@@ -22,6 +26,9 @@ int ItemDelete(Item *whom) {
 	}
 	if (KeyType1Delete(&(whom->key1))) {
 		return 13;
+	}
+	if (KeyType2Delete(&(whom->key2))) {
+		return 14;
 	}
 	return 0;
 }
@@ -37,5 +44,16 @@ int ItemReleaseFixer(Item *first) {
 		i++;
 		ptr = ptr->next;
 	}
+	return 0;
+}
+
+int ItemReleaseInsert(Item *first, Item *newitem) {
+	if (!first) {
+		return 1;
+	}
+	while (first->next) {
+		first = first->next;
+	}
+	first->next = newitem;
 	return 0;
 }

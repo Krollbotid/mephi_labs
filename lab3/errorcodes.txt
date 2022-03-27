@@ -7,4 +7,6 @@
 20      ks1 restriction - no elements with the same keys
 21      ks1 restriction - element with parent key was not found
 22      ks1 - failed keyspace1 delete
+23      ks1 - new version's of element parent key is not the same as first version's of that element parent key
+30      ks2 restriction - no elements with the same keys
 404     element not found
