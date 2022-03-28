@@ -31,3 +31,25 @@ int tabClear(Table *table) {
     }
     free(table);
 }
+
+int tableInsert(Table *table, KeyType1 par, Item *info) {
+	Item *dubl2 = NULL, *dubl1 = NULL;
+	int errcode = 0;
+	errcode = ks2Insert(table->ks2, table->msize2, info, &dubl1);
+	if (errcode) {
+		return errcode;
+	}
+	errcode = ks1Insert(table->ks1, par, info, &dub1);
+	if (errcode) {
+		ks2Remove(table->ks2, info->key2, table->msize2, &dubl2, 0);
+		return errcode;
+	}
+	if (dubl1 != dubl2) {
+		return 666;
+	}
+	errcode = ItemReleaseInsert(dubl, info);
+	if (errcode) {
+		return errcode;
+	}
+	return 0;
+}

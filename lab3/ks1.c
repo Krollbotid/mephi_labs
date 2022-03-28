@@ -36,7 +36,7 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 		if (ptr->key == key) {
 			if (ptr->info->key2 == info->key2) {
 				if (ptr->par == par) {
-                	*ans = ptr->info;
+                			*ans = ptr->info;
 					return 0;
 				}
 				return 23;
@@ -90,8 +90,8 @@ int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode) { // mode == 
 			return 404;
 		}
 	}
+	*ans = ptr->info;
 	if (ptr->info->next && !mode) {
-		*ans = ptr->info;
 		ptr->info = (*ans)->next;
 	} else {
 		if (ptr_prev) {
