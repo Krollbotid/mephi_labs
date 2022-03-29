@@ -29,6 +29,7 @@ int ItemDelete(Item *whom) {
 	if (KeyType2Delete(&(whom->key2))) {
 		return 14;
 	}
+	free(whom);
 	return 0;
 }
 
