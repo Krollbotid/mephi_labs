@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "table.h"
 
 int tabInit(Table *table, int msize2) {
@@ -33,6 +34,7 @@ int tabClear(Table *table) {
         return errcode;
     }
     free(table);
+	return 0;
 }
 
 int tabInsert(Table *table, KeyType1 par, Item *info) {
@@ -45,7 +47,7 @@ int tabInsert(Table *table, KeyType1 par, Item *info) {
 	if (errcode) {
 		return errcode;
 	}
-	errcode = ks1Insert(table->ks1, par, info, &dub1);
+	errcode = ks1Insert(table->ks1, par, info, &dubl1);
 	if (errcode) {
 		ks2Remove(table->ks2, info->key2, table->msize2, &dubl2, 0);
 		return errcode;
@@ -53,11 +55,8 @@ int tabInsert(Table *table, KeyType1 par, Item *info) {
 	if (dubl1 != dubl2) {
 		return 666;
 	}
-	errcode = ItemReleaseInsert(dubl, info);
-	if (errcode) {
-		return errcode;
-	}
-	return 0;
+	errcode = ItemReleaseInsert(dubl1, info);
+	return errcode;
 }
 
 int tabSearch(Table *table, KeyType1 key1, KeyType2 key2, Item **ans) {
@@ -65,9 +64,7 @@ int tabSearch(Table *table, KeyType1 key1, KeyType2 key2, Item **ans) {
 		return 1;
 	}
 	int errcode = ks2Search(table->ks2, table->msize2, key2, ans);
-	if (errcode) {
-		return errcode;
-	}
+	return errcode;
 }
 
 int tabRemove(Table *table, KeyType1 key1, KeyType2 key2) {
@@ -86,7 +83,7 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2) {
 	if (toremove1 != toremove2) {
 		return 666;
 	}
-	errcode = ItemDelete(toremove);
+	errcode = ItemDelete(toremove1);
 	if (errcode) {
 		return errcode;
 	}
@@ -104,7 +101,17 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode, Table *co
 	Item **ans;
 	switch (mode) {
 		case 1: {
-			ks1Search(table->key1, key1
+			errcode = ks1Search(table->ks1, key1, ans);
+			break;
+		}
+        case 2: {
+			errcode = ks2Search(table->ks2, table->msize2, key2, ans);
+			break;
+		}
+        case 3: {
+			errcode = tabSearch(table, key1, key2, ans);
+			break;
 		}
 	}
+	return errcode;
 }

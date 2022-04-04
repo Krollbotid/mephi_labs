@@ -1,7 +1,7 @@
 #include "dtable.h"
 
 int main() {
-	Table *table = (table*) malloc(sizeof(table));
+	Table *table = (Table*) malloc(sizeof(table));
 	int work = 1, errcode = tabInit(table, 40), id;
 	if (errcode) {
 		errprint(errcode);

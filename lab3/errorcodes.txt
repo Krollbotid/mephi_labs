@@ -1,6 +1,7 @@
 0       success
 1       zero in non-zero argument
 2       out of memory
+3       eof;
 11      item - failed infotype delete
 12      item - failed reltype delete
 13      item - failed keytype1 delete
@@ -10,5 +11,6 @@
 23      ks1 - new version's of element parent key is not the same as first version's of that element parent key
 30      ks2 restriction - no elements with the same keys
 32      ks2 - failed keyspace1 delete
+51      dialog - out of errmessages array
 404     element not found
 666     magic error

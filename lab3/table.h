@@ -12,5 +12,7 @@ typedef struct Table {
 } Table;
 
 int tabInit(Table *ans, int msize2);
+int tabInsert(Table *table, KeyType1 par, Item *info);
+int tabClear(Table *table);
 
 #endif

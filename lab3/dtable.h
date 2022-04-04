@@ -5,5 +5,7 @@
 
 int dinsert(Table *table);
 int dremove(Table *table);
+int menu(int *id);
+int errprint(int errcode);
 
 #endif

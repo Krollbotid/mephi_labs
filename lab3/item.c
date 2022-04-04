@@ -1,6 +1,7 @@
 #include "item.h"
 
 int InfoTypeDelete(InfoType *whom) {
+	free(whom);
 	return 0;
 }
 

@@ -20,6 +20,7 @@ typedef struct Item {
 	KeyType2 key2;
 } Item;
 
+int ItemDelete(Item *whom);
 int ItemClear(Item *whom);
 int ItemReleaseFixer(Item *first);
 int ItemReleaseInsert(Item *first, Item *newitem);

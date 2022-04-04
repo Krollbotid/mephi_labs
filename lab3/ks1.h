@@ -12,5 +12,6 @@ typedef struct KeySpace1 {
 
 int ks1InitCreate (KeySpace1 **where);
 int ks1Clear(KeySpace1 *src, int mode);
+int ks1Search(KeySpace1 *ks1, KeyType1 key, Item **ans);
 
 #endif

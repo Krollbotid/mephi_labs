@@ -63,7 +63,7 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 	return 0; // success
 }
 
-int ks1Search(KeySpace1 *ks1, KeyType1 key, KeySpace1 **ans) {
+int ks1Search(KeySpace1 *ks1, KeyType1 key, Item **ans) {
 	if (!ks1 || !key) {
 		return 1;
 	}
@@ -74,7 +74,7 @@ int ks1Search(KeySpace1 *ks1, KeyType1 key, KeySpace1 **ans) {
 			return 404; // element not found
 		}
 	}
-	*ans = ptr;
+	*ans = ptr->info;
 	return 0;
 }
 
