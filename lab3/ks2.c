@@ -94,7 +94,7 @@ int ks2Remove(KeySpace2 *ks2, KeyType2 key, int msize2, Item **ans, int mode) { 
 		ptr->info = (*ans)->next;
 	} else {
 		ptr_prev->next = ptr->next;
-		if (ks1Delete(ptr)) {
+		if (ks2Delete(ptr)) {
 			return 32;
 		}
 	}
@@ -110,11 +110,11 @@ int ks2Clear(KeySpace2 *src, int msize2, int mode) {// 0 clear only KeySpace2, n
 	}
 	int i = 0;
 	KeySpace2 *ptr = src, *ptr2, *ptr_prev;
-    for(; i < msize2; i++) {
+	for(; i < msize2; i++) {
         ptr2 = ptr->next;
-	    while (ptr->next) {
-	    	ptr_prev = ptr;
-	    	ptr = ptr->next;
+	    while (ptr2->next) {
+	    	ptr_prev = ptr2;
+	    	ptr2 = ptr2->next;
 	    	if (mode) {
 	    		if (ItemClear(ptr_prev->info)) {
 	    			return 666;
@@ -139,7 +139,7 @@ int ks2Print(KeySpace2 *ks2, int msize2) {
 	for (i = 0; i < msize2; i++) {
 		ptr = ks2->next;
 		while (ptr) {
-			printf("Key:%f\n", ptr->key);
+			printf("Key:%d\n", ptr->key);
 			errcode = ItemPrint(ptr->info);
 			if (errcode) {
 				return errcode;

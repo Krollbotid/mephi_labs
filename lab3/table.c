@@ -3,6 +3,9 @@
 #include <stdio.h>
 
 int tabInit(Table *table, int msize2) {
+	if (!table) {
+		return 1;
+	}
     KeySpace1 *ks1;
     KeySpace2 *ks2;
     int errcode = 0;
@@ -99,18 +102,18 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode, Table *co
 	if (errcode) {
 		return errcode;
 	}
-	Item **ans;
+	Item *ans = (Item*) malloc (sizeof(Item*));
 	switch (mode) {
 		case 1: {
-			errcode = ks1Search(table->ks1, key1, ans);
+			errcode = ks1Search(table->ks1, key1, &ans);
 			break;
 		}
         case 2: {
-			errcode = ks2Search(table->ks2, table->msize2, key2, ans);
+			errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
 			break;
 		}
         case 3: {
-			errcode = tabSearch(table, key1, key2, ans);
+			errcode = tabSearch(table, key1, key2, &ans);
 			break;
 		}
 	}
@@ -126,6 +129,6 @@ int tabPrint(Table *table) {
 	if (errcode) {
 		return errcode;
 	}
-	int errcode = ks2Print(table->ks2, table->msize2);
+	errcode = ks2Print(table->ks2, table->msize2);
 	return errcode;
 }

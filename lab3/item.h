@@ -15,7 +15,7 @@ typedef int KeyType2;
 typedef struct Item {
 	InfoType *info;
 	RelType release;
-	Item *next;
+	struct Item *next;
 	KeyType1 key1;
 	KeyType2 key2;
 } Item;

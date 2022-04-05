@@ -6,7 +6,7 @@
 typedef struct KeySpace2 {
 	KeyType2 key;
 	Item *info;
-	KeySpace2 *next;
+	struct KeySpace2 *next;
 } KeySpace2;
 
 int ks2ArrCreate(int msize2, KeySpace2 **ans);

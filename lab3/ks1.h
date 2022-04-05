@@ -7,7 +7,7 @@ typedef struct KeySpace1 {
 	KeyType1 key;
 	KeyType1 par;
 	Item *info;
-	KeySpace1 *next;
+	struct KeySpace1 *next;
 } KeySpace1;
 
 int ks1InitCreate (KeySpace1 **where);

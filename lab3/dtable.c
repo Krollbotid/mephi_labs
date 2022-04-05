@@ -110,7 +110,5 @@ int dRemove(Table *table) {
 		printf("\nIncorrect input. Please try again.\n");
 	}
 	int errcode = tabRemove(table, key1, key2);
-	if (errcode) {
-		return errcode;
-	}
+	return errcode;
 }
