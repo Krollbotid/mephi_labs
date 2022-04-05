@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "ks1.h"
+#include <stdio.h>
 
 int ks1Delete (KeySpace1 *whom) {
 	free(whom);
@@ -122,6 +123,23 @@ int ks1Clear(KeySpace1 *src, int mode) {// 0 clear only KeySpace1, not 0 clear a
 		if (ks1Delete(ptr)) {
 			return 666;
 		}
+	}
+	return 0;
+}
+
+int ks1Print(KeySpace1 *ks1) {
+	if (!ks1) {
+		return 1;
+	}
+	printf("By KeySpace1:\n");
+	int errcode;
+	while (ks1) {
+		printf("Key:%f Parent key:%f\n", ks1->key, ks1->par);
+		errcode = ItemPrint(ks1->info);
+		if (errcode) {
+			return errcode;
+		}
+		ks1 = ks1->next;
 	}
 	return 0;
 }

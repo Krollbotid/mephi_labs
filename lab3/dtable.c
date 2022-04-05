@@ -1,5 +1,6 @@
 #include "dtable.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 int menu(int *id) {
 	*id = -1;
@@ -45,7 +46,10 @@ int errprint(int errcode) {
 	return 0;
 }
 
-int dinsert(Table *table) {
+int dInsert(Table *table) {
+	if (!table) {
+		return 1;
+	}
 	InfoType *info = (InfoType*) malloc(sizeof(InfoType));
 	if (!info) {
 		return 2;
@@ -85,4 +89,28 @@ int dinsert(Table *table) {
 		ItemDelete(item);
 	}
 	return errcode;
+}
+
+int dRemove(Table *table) {
+	if (!table) {
+		return 1;
+	}
+	int k = -1;
+	KeyType1 key1;
+	KeyType2 key2;
+	printf("Please input key1, key2 in following format:key1/key2\nInput:");
+	while (k < 2) {
+		k = scanf("%f/%d", &key1,  &key2);
+		if (k < 0) {
+			return 3;
+		}
+		if (k == 2) {
+			break;
+		}
+		printf("\nIncorrect input. Please try again.\n");
+	}
+	int errcode = tabRemove(table, key1, key2);
+	if (errcode) {
+		return errcode;
+	}
 }

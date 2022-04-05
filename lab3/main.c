@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "dtable.h"
 
 int main() {
@@ -23,6 +24,9 @@ int main() {
 				break;
 			case 2:
 				dRemove(table);
+				break;
+			case 3:
+				tabPrint(table);
 				break;
 			case 0:
 				work = 0;

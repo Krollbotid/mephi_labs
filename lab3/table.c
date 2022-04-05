@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "table.h"
+#include <stdio.h>
 
 int tabInit(Table *table, int msize2) {
     KeySpace1 *ks1;
@@ -76,7 +77,7 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2) {
 	if (errcode) {
 		return errcode;
 	}
-	errcode = ks1Remove(table->ks1, key1, &toremove1, 0);
+	errcode = ks1Remove(&(table->ks1), key1, &toremove1, 0);
 	if (errcode) {
 		return errcode;
 	}
@@ -113,5 +114,18 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode, Table *co
 			break;
 		}
 	}
+	return errcode;
+}
+
+int tabPrint(Table *table) {
+	if (!table) {
+		return 1;
+	}
+	printf("Size of KeySpace2:%d. Printing table:\n", table->msize2);
+	int errcode = ks1Print(table->ks1);
+	if (errcode) {
+		return errcode;
+	}
+	int errcode = ks2Print(table->ks2, table->msize2);
 	return errcode;
 }

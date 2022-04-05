@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "ks2.h"
+#include <stdio.h>
 
 int keytohash(KeyType2 key, int msize2) {
     return (int) key % msize2;
@@ -125,5 +126,27 @@ int ks2Clear(KeySpace2 *src, int msize2, int mode) {// 0 clear only KeySpace2, n
 	    }
         ptr++;
     }
+	return 0;
+}
+
+int ks2Print(KeySpace2 *ks2, int msize2) {
+	if (!ks2) {
+		return 1;
+	}
+	printf("By KeySpace2:\n");
+	int errcode, i;
+	KeySpace2 *ptr;
+	for (i = 0; i < msize2; i++) {
+		ptr = ks2->next;
+		while (ptr) {
+			printf("Key:%f\n", ptr->key);
+			errcode = ItemPrint(ptr->info);
+			if (errcode) {
+				return errcode;
+			}
+			ptr = ptr->next;
+		}
+		ks2++;
+	}
 	return 0;
 }

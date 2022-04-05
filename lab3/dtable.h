@@ -3,8 +3,8 @@
 
 #include "table.h"
 
-int dinsert(Table *table);
-int dremove(Table *table);
+int dInsert(Table *table);
+int dRemove(Table *table);
 int menu(int *id);
 int errprint(int errcode);
 

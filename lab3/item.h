@@ -24,5 +24,6 @@ int ItemDelete(Item *whom);
 int ItemClear(Item *whom);
 int ItemReleaseFixer(Item *first);
 int ItemReleaseInsert(Item *first, Item *newitem);
+int ItemPrint(Item *first);
 
 #endif

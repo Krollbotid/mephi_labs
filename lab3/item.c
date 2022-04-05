@@ -1,4 +1,6 @@
 #include "item.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 int InfoTypeDelete(InfoType *whom) {
 	free(whom);
@@ -71,5 +73,31 @@ int ItemReleaseInsert(Item *first, Item *newitem) {
 		first = first->next;
 	}
 	first->next = newitem;
+	return 0;
+}
+
+int InfoPrint(InfoType *info) {
+	if (!info) {
+		return 1;
+	}
+	printf("tend:%d tbegin:%d count:%d divided:%f", info->tbegin, info->tend, info->count, info->divided);
+	return 0;
+}
+
+int ItemPrint(Item *first) {
+	if (!first) {
+		return 1;
+	}
+	int errcode;
+	printf("Key1:%f Key2:%d\n", first->key1, first->key2);
+	while (first) {
+		printf("Release:%d ", first->release);
+		errcode = InfoPrint(first->info);
+		printf("\n");
+		if (errcode) {
+			return errcode;
+		}
+		first = first->next;
+	}
 	return 0;
 }
