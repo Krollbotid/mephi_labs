@@ -19,6 +19,10 @@ int KeyType2Delete(KeyType2 *whom) {
 	return 0;
 }
 
+int PointerType1Delete(PointerType1 *whom) {
+	return 0;
+}
+
 int ItemDelete(Item *whom) {
 	if (InfoTypeDelete(whom->info)) {
 		return 11;
@@ -31,6 +35,9 @@ int ItemDelete(Item *whom) {
 	}
 	if (KeyType2Delete(&(whom->key2))) {
 		return 14;
+	}
+	if (PointerType1Delete(&(whom->p1))) {
+		return 15;
 	}
 	free(whom);
 	return 0;
@@ -45,7 +52,7 @@ int ItemClear(Item *src) {
 		ptr = src;
 		src = src->next;
 		if (ItemDelete(ptr)) {
-			return 666;
+			return 6;
 		}
 	}
 	return 0;

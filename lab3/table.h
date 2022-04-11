@@ -14,8 +14,11 @@ typedef struct Table {
 int tabInit(Table *ans, int msize2);
 int tabInsert(Table *table, KeyType1 par, Item *info);
 int tabClear(Table *table);
-int tabRemove(Table *table, KeyType1 key1, KeyType2 key2);
+int tabRemove(Table *table, KeyType1 key1, KeyType2 key2, int mode);
 int tabPrint(Table *table);
 int tabSearch(Table *table, KeyType1 key1, KeyType2 key2);
+int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode);
+int parSearch(Table *table, KeyType1 par);
+int multRemove(Table *table, KeyType1 key1);
 
 #endif

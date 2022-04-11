@@ -27,19 +27,25 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 	KeyType1 key = info->key1;
 	KeySpace1 *ptr = ks1;
 	if (!(ks1->info)) {
+		if (par) {
+			return 21;
+		}
 		ptr->key = key;
 		ptr->par = par;
 		ptr->info = info;
 		ptr->next = NULL;
+		info->p1 = (PointerType1*) ptr;
 		*ans = NULL;
 		return 0;
 	}
 	int parfound = 0;
-	while (ptr->next) {
+	while (ks1) {
+		ptr = ks1;
 		if (ptr->key == key) {
 			if (ptr->info->key2 == info->key2) {
 				if (ptr->par == par) {
-                			*ans = ptr->info;
+                	*ans = ptr->info;
+					info->p1 = ptr;
 					return 0;
 				}
 				return 23;
@@ -49,7 +55,7 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 		if (ptr->key == par) {
 			parfound = 1;
 		}
-		ptr = ptr->next;
+		ks1 = ks1->next;
 	}
 	if (!parfound && par) {
 		return 21; // ks1 restriction - element with parent key was not found
@@ -63,18 +69,19 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 	ptr->par = par;
 	ptr->info = info;
 	ptr->next = NULL;
+	info->p1 = ptr;
 	return 0; // success
 }
 
-int ks1Search(KeySpace1 *ks1, KeyType1 key, KeyType1 *par, Item **ans) {
-	if (!ks1 || !key || !par) {
+int ks1Search(KeySpace1 *ks1, KeyType1 key, Item **ans) {
+	if (!ks1 || !key) {
 		return 1;
 	}
 	KeySpace1 *ptr = ks1;
 	while (key != ptr->key) {
 		ptr = ptr->next;
 		if (!ptr) {
-			return 404; // element not found
+			return 4; // element not found
 		}
 	}
 	*ans = ptr->info;
@@ -90,7 +97,7 @@ int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode) { // mode == 
 		ptr_prev = ptr;
 		ptr = ptr->next;
 		if (!ptr) {
-			return 404;
+			return 4;
 		}
 	}
 	*ans = ptr->info;
@@ -119,11 +126,11 @@ int ks1Clear(KeySpace1 *src, int mode) {// 0 clear only KeySpace1, not 0 clear a
 		src = src->next;
 		if (mode) {
 			if (ItemClear(ptr->info)) {
-				return 666;
+				return 6;
 			}
 		}
 		if (ks1Delete(ptr)) {
-			return 666;
+			return 6;
 		}
 	}
 	return 0;

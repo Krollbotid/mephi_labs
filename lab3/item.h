@@ -11,6 +11,7 @@ typedef struct InfoType {
 typedef int RelType;
 typedef float KeyType1;
 typedef int KeyType2;
+typedef void PointerType1;
 
 typedef struct Item {
 	InfoType *info;
@@ -18,6 +19,7 @@ typedef struct Item {
 	struct Item *next;
 	KeyType1 key1;
 	KeyType2 key2;
+	PointerType1 *p1;
 } Item;
 
 int ItemDelete(Item *whom);

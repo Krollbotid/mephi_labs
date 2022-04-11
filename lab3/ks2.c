@@ -70,7 +70,7 @@ int ks2Search(KeySpace2 *ks2, int msize2, KeyType2 key, Item **ans) {
     while(key != ptr->key) {
         ptr = ptr->next;
         if (!ptr) {
-            return 404;
+            return 4;
         }
     }
 	*ans = ptr->info;
@@ -84,13 +84,13 @@ int ks2Remove(KeySpace2 *ks2, KeyType2 key, int msize2, Item **ans, int mode) { 
 	KeySpace2 *ptr = ks2 + keytohash(key, msize2), *ptr_prev = ptr;
 	ptr = ptr->next;
     if (!ptr) {
-        return 404;
+        return 4;
     }
 	while (key != ptr->key) {
 		ptr_prev = ptr;
 		ptr = ptr->next;
 		if (!ptr) {
-			return 404;
+			return 4;
 		}
 	}
 	*ans = ptr->info;
@@ -121,11 +121,11 @@ int ks2Clear(KeySpace2 *src, int msize2, int mode) {// 0 clear only KeySpace2, n
 	    	ptr2 = ptr2->next;
 	    	if (mode) {
 	    		if (ItemClear(ptr_prev->info)) {
-	    			return 666;
+	    			return 6;
 	    		}
 	    	}
 	    	if (ks2Delete(ptr_prev)) {
-	    		return 666;
+	    		return 6;
 	    	}
 	    }
         ptr++;

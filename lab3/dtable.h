@@ -6,6 +6,12 @@
 int dInsert(Table *table);
 int dRemove(Table *table);
 int menu(int *id);
-int errprint(int errcode);
+char **errarray();
+int errprint(int errcode, char **arr);
+int dSearch(Table *table);
+int dSearchAny(Table *table);
+int dRemoveAny(Table *table);
+int dparSearch(Table *table);
+int dmultRemove(Table *table);
 
 #endif
