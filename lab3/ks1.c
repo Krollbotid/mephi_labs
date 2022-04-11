@@ -16,6 +16,7 @@ int ks1InitCreate (KeySpace1 **where) {
 		return 2;
 	}
 	(*where)->info = NULL;
+    (*where)->next = NULL;
 	return 0;
 }
 
@@ -112,7 +113,7 @@ int ks1Clear(KeySpace1 *src, int mode) {// 0 clear only KeySpace1, not 0 clear a
 		return 0;
 	}
 	KeySpace1 *ptr = src;
-	while (src->next) {
+	while (src) {
 		ptr = src;
 		src = src->next;
 		if (mode) {
@@ -132,9 +133,12 @@ int ks1Print(KeySpace1 *ks1) {
 		return 1;
 	}
 	printf("By KeySpace1:\n");
+    if(!(ks1->info)) {
+        return 24;
+    }
 	int errcode;
 	while (ks1) {
-		printf("Key:%f Parent key:%f\n", ks1->key, ks1->par);
+        printf("Key:%f Parent key:%f\n", ks1->key, ks1->par);
 		errcode = ItemPrint(ks1->info);
 		if (errcode) {
 			return errcode;

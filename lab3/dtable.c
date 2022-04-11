@@ -3,8 +3,10 @@
 #include <stdio.h>
 
 int menu(int *id) {
+    printf("Menu:\n0.Exit\n1.Insert into table.\n2.Remove out of table.\n3.Print table to console.\n");
 	*id = -1;
 	while (*id < 0) {
+        printf("Please, enter id of menu:");
 		if(scanf("%d", id) < 0) {
 			return 3;
 		}
@@ -29,6 +31,7 @@ char **errarray() {
 	arr[21] = "ks1 restriction - element with parent key was not found";
 	arr[22] = "ks1 - failed keyspace1 delete";
 	arr[23] = "ks1 - new version\'s of element parent key is not the same as first version\'s of that element parent key";
+    arr[24] = "ks1 - table is empty";
 	arr[30] = "ks2 restriction - no elements with the same keys";
 	arr[32] = "ks2 - failed keyspace1 delete";
 	arr[51] = "dialog - out of errmessages array";
@@ -63,8 +66,8 @@ int dInsert(Table *table) {
 	float divided;
 	KeyType1 key1, par;
 	KeyType2 key2;
-	printf("Please input tbegin, tend, count, divided, key1, par, key2 in following format:\ntbegin/tend/count/divided/key1/par/key2\nInput:");
 	while (k < 7) {
+        printf("Please input tbegin, tend, count, divided, key1, par, key2 in following format:\ntbegin/tend/count/divided/key1/par/key2\nWhere tbegin,tend,count,key2 are integer; divided,key1,par are float.\nInput:");
 		k = scanf("%d/%d/%d/%f/%f/%f/%d", &tbegin, &tend, &count, &divided, &key1, &par, &key2);
 		if (k < 0) {
 			free(info);
@@ -111,4 +114,21 @@ int dRemove(Table *table) {
 	}
 	int errcode = tabRemove(table, key1, key2);
 	return errcode;
+}
+
+int tabPrint(Table *table) {
+    if (!table) {
+        return 1;
+    }
+    printf("Size of KeySpace2:%d. Printing table:\n", table->msize2);
+    if (!(table->ks1)) {
+        printf("Table is empty.\n");
+        return 0;
+    }
+    int errcode = ks1Print(table->ks1);
+    if (errcode) {
+        return errcode;
+    }
+    errcode = ks2Print(table->ks2, table->msize2);
+    return errcode;
 }

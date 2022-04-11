@@ -59,7 +59,11 @@ int tabInsert(Table *table, KeyType1 par, Item *info) {
 	if (dubl1 != dubl2) {
 		return 666;
 	}
-	errcode = ItemReleaseInsert(dubl1, info);
+    if (dubl1) {
+        errcode = ItemReleaseInsert(dubl1, info);
+    } else {
+        info->release = 1;
+    }
 	return errcode;
 }
 
@@ -117,18 +121,5 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode, Table *co
 			break;
 		}
 	}
-	return errcode;
-}
-
-int tabPrint(Table *table) {
-	if (!table) {
-		return 1;
-	}
-	printf("Size of KeySpace2:%d. Printing table:\n", table->msize2);
-	int errcode = ks1Print(table->ks1);
-	if (errcode) {
-		return errcode;
-	}
-	errcode = ks2Print(table->ks2, table->msize2);
 	return errcode;
 }

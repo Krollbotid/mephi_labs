@@ -82,6 +82,9 @@ int ks2Remove(KeySpace2 *ks2, KeyType2 key, int msize2, Item **ans, int mode) { 
 	}
 	KeySpace2 *ptr = ks2 + keytohash(key, msize2), *ptr_prev = ptr;
 	ptr = ptr->next;
+    if (!ptr) {
+        return 404;
+    }
 	while (key != ptr->key) {
 		ptr_prev = ptr;
 		ptr = ptr->next;
@@ -112,7 +115,7 @@ int ks2Clear(KeySpace2 *src, int msize2, int mode) {// 0 clear only KeySpace2, n
 	KeySpace2 *ptr = src, *ptr2, *ptr_prev;
 	for(; i < msize2; i++) {
         ptr2 = ptr->next;
-	    while (ptr2->next) {
+	    while (ptr2) {
 	    	ptr_prev = ptr2;
 	    	ptr2 = ptr2->next;
 	    	if (mode) {

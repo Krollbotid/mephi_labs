@@ -24,13 +24,22 @@ int main() {
 		}
 		switch(id) {
 			case 1:
-				dInsert(table);
+                errcode = dInsert(table);
+                if (errcode) {
+                    errprint(errcode);
+                }
 				break;
 			case 2:
-				dRemove(table);
+                errcode = dRemove(table);
+                if (errcode) {
+                    errprint(errcode);
+                }
 				break;
 			case 3:
-				tabPrint(table);
+				errcode = tabPrint(table);
+                if (errcode) {
+                    errprint(errcode);
+                }
 				break;
 			case 0:
 				work = 0;
