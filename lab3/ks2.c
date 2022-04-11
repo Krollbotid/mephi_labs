@@ -57,6 +57,7 @@ int ks2Insert(KeySpace2 *ks2, int msize2, Item *info, Item **ans) {
     ptr->next->key = key;
     ptr->next->info = info;
     ptr->next->next = NULL;
+	*ans = NULL;
     return 0;
 }
 
@@ -129,6 +130,7 @@ int ks2Clear(KeySpace2 *src, int msize2, int mode) {// 0 clear only KeySpace2, n
 	    }
         ptr++;
     }
+	free(src);
 	return 0;
 }
 

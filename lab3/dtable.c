@@ -116,19 +116,24 @@ int dRemove(Table *table) {
 	return errcode;
 }
 
-int tabPrint(Table *table) {
-    if (!table) {
-        return 1;
-    }
-    printf("Size of KeySpace2:%d. Printing table:\n", table->msize2);
-    if (!(table->ks1)) {
-        printf("Table is empty.\n");
-        return 0;
-    }
-    int errcode = ks1Print(table->ks1);
-    if (errcode) {
-        return errcode;
-    }
-    errcode = ks2Print(table->ks2, table->msize2);
-    return errcode;
+int dSearch(Table *table) {
+	if (!table) {
+		return 1;
+	}
+	printf("Please input key1, key2 in following format:key1/key2\nInput:");
+	int k = -1;
+	KeyType1 key1;
+	KeyType2 key2;
+	while (k < 2) {
+                k = scanf("%f/%d", &key1,  &key2);
+                if (k < 0) {
+                        return 3;
+                }
+                if (k == 2) {
+                        break;
+                }
+                printf("\nIncorrect input. Please try again.\n");
+        }
+        int errcode = tabSearch(table, key1, key2);
+	return errcode;
 }

@@ -31,6 +31,7 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 		ptr->par = par;
 		ptr->info = info;
 		ptr->next = NULL;
+		*ans = NULL;
 		return 0;
 	}
 	int parfound = 0;
@@ -65,8 +66,8 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 	return 0; // success
 }
 
-int ks1Search(KeySpace1 *ks1, KeyType1 key, Item **ans) {
-	if (!ks1 || !key) {
+int ks1Search(KeySpace1 *ks1, KeyType1 key, KeyType1 *par, Item **ans) {
+	if (!ks1 || !key || !par) {
 		return 1;
 	}
 	KeySpace1 *ptr = ks1;
@@ -98,11 +99,11 @@ int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode) { // mode == 
 	} else {
 		if (ptr_prev) {
 			ptr_prev->next = ptr->next;
-			if (ks1Delete(ptr)) {
-				return 22;
-			}
 		} else {
 			*ks1 = (*ks1)->next;
+		}
+		if (ks1Delete(ptr)) {
+			return 22;
 		}
 	}
 	return 0;

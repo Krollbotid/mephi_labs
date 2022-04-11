@@ -41,7 +41,7 @@ int ItemClear(Item *src) {
 		return 0;
 	}
 	Item *ptr = src;
-	while (src->next) {
+	while (src) {
 		ptr = src;
 		src = src->next;
 		if (ItemDelete(ptr)) {

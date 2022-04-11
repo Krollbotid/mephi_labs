@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdlib.h>
 #include "table.h"
 #include <stdio.h>
@@ -67,11 +68,65 @@ int tabInsert(Table *table, KeyType1 par, Item *info) {
 	return errcode;
 }
 
-int tabSearch(Table *table, KeyType1 key1, KeyType2 key2, Item **ans) {
-	if (!table || !ans || !key1) {
+int tabPrint(Table *table) {
+    if (!table) {
+        return 1;
+    }
+    printf("Size of KeySpace2:%d. Printing table:\n", table->msize2);
+    if (!(table->ks1)) {
+        printf("Table is empty.\n");
+        return 0;
+    }
+    int errcode = ks1Print(table->ks1);
+    if (errcode) {
+        return errcode;
+    }
+    errcode = ks2Print(table->ks2, table->msize2);
+    return errcode;
+}
+
+
+int tabSearch(Table *table, KeyType1 key1, KeyType2 key2) {
+	if (!table || !key1) {
 		return 1;
 	}
-	int errcode = ks2Search(table->ks2, table->msize2, key2, ans);
+	Item *ans;
+	KeyType1 par;
+	int errcode = ks1Search(table->ks1, key1, &par, &ans);
+	if (errcode) {
+		return errcode;
+	}
+	Table *cop = (Table*) malloc(sizeof(Table));
+	if (!cop) {
+		return 2;
+	}
+	errcode = tabInit(cop, 1);
+	if (errcode) {
+                return errcode;
+        }
+	while (ans) {
+		InfoType *info = (InfoType*) malloc(sizeof(InfoType));
+		if (!info) {
+			return 2;
+		}
+		Item *item = (Item*) malloc(sizeof(Item));
+		if (!item) {
+			return 2;
+		}
+		memcpy(info, ans->info, sizeof(InfoType));
+		memcpy(item, ans, sizeof(Item));
+		item->info = info;
+		ans = ans->next;
+		errcode = tabInsert(cop, par, item);
+	        if (errcode) {
+        	        return errcode;
+        	}
+	}
+	errcode = tabPrint(cop);
+        if (errcode) {
+                return errcode;
+        }
+	errcode = tabClear(cop);
 	return errcode;
 }
 
@@ -109,7 +164,8 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode, Table *co
 	Item *ans = (Item*) malloc (sizeof(Item*));
 	switch (mode) {
 		case 1: {
-			errcode = ks1Search(table->ks1, key1, &ans);
+			KeyType1 par;
+			errcode = ks1Search(table->ks1, key1, &par, &ans);
 			break;
 		}
         case 2: {
@@ -117,7 +173,7 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode, Table *co
 			break;
 		}
         case 3: {
-			errcode = tabSearch(table, key1, key2, &ans);
+			errcode = tabSearch(table, key1, key2);
 			break;
 		}
 	}
