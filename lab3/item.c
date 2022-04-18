@@ -80,6 +80,7 @@ int ItemReleaseInsert(Item *first, Item *newitem) {
 		first = first->next;
 	}
 	first->next = newitem;
+    newitem->release = first->release + 1;
 	return 0;
 }
 
@@ -87,7 +88,7 @@ int InfoPrint(InfoType *info) {
 	if (!info) {
 		return 1;
 	}
-	printf("tend:%d tbegin:%d count:%d divided:%f", info->tbegin, info->tend, info->count, info->divided);
+	printf("tend:%d tbegin:%d count:%d divided:%5.2f", info->tbegin, info->tend, info->count, info->divided);
 	return 0;
 }
 
@@ -96,7 +97,7 @@ int ItemPrint(Item *first) {
 		return 1;
 	}
 	int errcode;
-	printf("Key1:%f Key2:%d\n", first->key1, first->key2);
+	printf("Key1:%5.2f Key2:%d\n", first->key1, first->key2);
 	while (first) {
 		printf("Release:%d ", first->release);
 		errcode = InfoPrint(first->info);

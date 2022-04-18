@@ -145,11 +145,13 @@ int ks2Print(KeySpace2 *ks2, int msize2) {
 		ptr = ks2->next;
 		while (ptr) {
 			printf("Key:%d\n", ptr->key);
+            printf("\n");
 			errcode = ItemPrint(ptr->info);
 			if (errcode) {
 				return errcode;
 			}
 			ptr = ptr->next;
+            printf("\n");
 		}
 		ks2++;
 	}

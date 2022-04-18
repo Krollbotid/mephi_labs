@@ -2,13 +2,15 @@
 #include "dtable.h"
 
 int main() {
+    int ks2size = 0;
+    getsizeofks2(&ks2size);
 	Table *table = (Table*) malloc(sizeof(Table));
 	char **arr = errarray();
 	if (!table) {
 		errprint(2, arr);
 		return 0;
 	}
-	int work = 1, errcode = tabInit(table, 40), id;
+	int work = 1, errcode = tabInit(table, ks2size), id;
 	if (errcode) {
 		errprint(errcode, arr);
 		return 0;

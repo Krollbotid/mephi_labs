@@ -20,13 +20,13 @@ int ks1InitCreate (KeySpace1 **where) {
 	return 0;
 }
 
-int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
+int ks1Insert(KeySpace1 **ks1, KeyType1 par, Item *info, Item **ans) {
 	if (!ks1 || !info || !(info->key1)) {
 		return 1; // zero in non-zero argument
 	}
 	KeyType1 key = info->key1;
-	KeySpace1 *ptr = ks1;
-	if (!(ks1->info)) {
+	KeySpace1 *ptr = *ks1;
+	if (!((*ks1)->info)) {
 		if (par) {
 			return 21;
 		}
@@ -39,12 +39,11 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 		return 0;
 	}
 	int parfound = 0;
-	while (ks1) {
-		ptr = ks1;
+	while (ptr) {
 		if (ptr->key == key) {
 			if (ptr->info->key2 == info->key2) {
 				if (ptr->par == par) {
-                	*ans = ptr->info;
+                			*ans = ptr->info;
 					info->p1 = ptr;
 					return 0;
 				}
@@ -54,21 +53,22 @@ int ks1Insert(KeySpace1 *ks1, KeyType1 par, Item *info, Item **ans) {
 		}
 		if (ptr->key == par) {
 			parfound = 1;
+			break;
 		}
-		ks1 = ks1->next;
+		ptr = ptr->next;
 	}
 	if (!parfound && par) {
 		return 21; // ks1 restriction - element with parent key was not found
 	}
-	ptr->next = (KeySpace1*) malloc(sizeof(KeySpace1));
-	if (!(ptr->next)) {
+	ptr = (KeySpace1*) malloc(sizeof(KeySpace1));
+	if (!ptr) {
 		return 2; // out of memory
 	}
-	ptr = ptr->next;
+	ptr->next = *ks1;
+	*ks1 = ptr;
 	ptr->key = key;
 	ptr->par = par;
 	ptr->info = info;
-	ptr->next = NULL;
 	info->p1 = ptr;
 	return 0; // success
 }
@@ -146,12 +146,14 @@ int ks1Print(KeySpace1 *ks1) {
     }
 	int errcode;
 	while (ks1) {
-        printf("Key:%f Parent key:%f\n", ks1->key, ks1->par);
+        printf("Key:%5.2f Parent key:%5.2f\n", ks1->key, ks1->par);
+        printf("\n");
 		errcode = ItemPrint(ks1->info);
 		if (errcode) {
 			return errcode;
 		}
 		ks1 = ks1->next;
+        printf("\n");
 	}
 	return 0;
 }

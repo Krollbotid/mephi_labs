@@ -2,6 +2,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+int getsizeofks2(int *size) {
+    while (*size <= 0) {
+        printf("Please, enter size of KeySpace2 (natural number):");
+        if(scanf("%d", size) < 0) {
+            return 3;
+        }
+        if (*size > 0){
+            break;
+        }
+        scanf("%*[^\n]");
+        printf("Incorrect input. Please try again.\n");
+    }
+    return 0;
+}
+
 int menu(int *id) {
     printf("Menu:\n0.Exit\n1.Insert into table.\n2.Remove out of table.\n3.Print table to console.\n4.Search elements by compound key.\n5.Search elements by non-compound key.\n6.Remove all elements by non-compound key.\n7.Recursive removing of elements by key1.\n8.Search all elements by parent key.\n");
 	*id = -1;

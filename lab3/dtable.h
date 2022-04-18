@@ -3,6 +3,7 @@
 
 #include "table.h"
 
+int getsizeofks2(int *size);
 int dInsert(Table *table);
 int dRemove(Table *table);
 int menu(int *id);
