@@ -67,6 +67,9 @@ int ks2Search(KeySpace2 *ks2, int msize2, KeyType2 key, Item **ans) {
     }
     KeySpace2 *ptr = ks2 + keytohash(key, msize2);
     ptr = ptr->next;
+	if(!ptr) {
+		return 4;
+	}
     while(key != ptr->key) {
         ptr = ptr->next;
         if (!ptr) {

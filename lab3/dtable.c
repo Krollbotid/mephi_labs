@@ -166,20 +166,21 @@ int dSearchAny(Table *table) {
 	int k = -1, mode = -1;
 	KeyType1 key1 = 0;
 	KeyType2 key2 = 0;
-	while (k < 1) {
-        k = scanf("%d", &mode);
-        if (k < 0) {
-            return 3;
-        }
-        if (k > 0 && (mode == 1 || mode == 2)) {
-            break;
-        }
-        scanf("%*[^\n]");
-        printf("\nIncorrect input. Please try again.\n");
-    }
+	while (k < 1 || (mode > 2 || mode < 1)) {
+		mode = -1;
+	        k = scanf("%d", &mode);
+        	if (k < 0) {
+        	    	return 3;
+        	}
+        	if (k > 0 && (mode == 1 || mode == 2)) {
+        	    	break;
+        	}
+        	scanf("%*[^\n]");
+        	printf("\nIncorrect input. Please try again.\n");
+    	}
 	if (mode == 1) {
 		printf("Please input key1 (float)\nInput:");
-        k = -1;
+        	k = -1;
 		while (k < 1) {
     	    k = scanf("%f", &key1);
     	    if (k < 0) {

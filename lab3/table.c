@@ -92,42 +92,48 @@ int tabSearch(Table *table, KeyType1 key1, KeyType2 key2) {
 		return 1;
 	}
 	Item *ans;
-	int errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
-	if (errcode) {
-		return errcode;
-	}
+	ans = table->ks1->info;
+	//while (ans->key1 != key2) {
+		int errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
+		if (errcode) {
+			return errcode;
+		}
+	//}
 	Table *cop = (Table*) malloc(sizeof(Table));
 	if (!cop) {
 		return 2;
 	}
 	errcode = tabInit(cop, 1);
 	if (errcode) {
-        return errcode;
-    }
-	KeySpace1 *ptr = (KeySpace1*) ans->p1;
+        	return errcode;
+	}
 	while (ans) {
 		InfoType *info = (InfoType*) malloc(sizeof(InfoType));
 		if (!info) {
+			tabClear(cop);
 			return 2;
 		}
 		Item *item = (Item*) malloc(sizeof(Item));
 		if (!item) {
-            free(info);
+            		free(info);
+			tabClear(cop);
 			return 2;
 		}
 		memcpy(info, ans->info, sizeof(InfoType));
 		memcpy(item, ans, sizeof(Item));
 		item->info = info;
+		item->next = NULL;
 		ans = ans->next;
 		errcode = tabInsert(cop, 0, item);
-	    if (errcode) {
-        	return errcode;
-        }
+	    	if (errcode) {
+			tabClear(cop);
+        		return errcode;
+        	}
 	}
 	errcode = tabPrint(cop);
-    if (errcode) {
-        return errcode;
-    }
+    	if (errcode) {
+        	return errcode;
+    	}
 	errcode = tabClear(cop);
 	return errcode;
 }
@@ -148,7 +154,11 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2, int mode) {
 	if (toremove1 != toremove2) {
 		return 6;
 	}
-	errcode = ItemDelete(toremove1);
+	if (mode) {
+		errcode = ItemClear(toremove1);
+	} else {
+		errcode = ItemDelete(toremove1);
+	}
     return errcode;
 }
 
@@ -181,7 +191,6 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode) {// 1 - k
 			break;
 		}
 	}
-	KeySpace1 *ptr = (KeySpace1*) ans->p1;
 	while (ans) {
 		InfoType *info = (InfoType*) malloc(sizeof(InfoType));
 		if (!info) {
@@ -197,6 +206,7 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode) {// 1 - k
 		memcpy(info, ans->info, sizeof(InfoType));
 		memcpy(item, ans, sizeof(Item));
 		item->info = info;
+		item->next = NULL;
 		ans = ans->next;
 		errcode = tabInsert(cop, 0, item);
 	    if (errcode) {
@@ -243,6 +253,7 @@ int parSearch(Table *table, KeyType1 par) {
                 memcpy(info, ans->info, sizeof(InfoType));
                 memcpy(item, ans, sizeof(Item));
                 item->info = info;
+		item->next = NULL;
                 ans = ans->next;
                 errcode = tabInsert(cop, 0, item);
                 if (errcode) {
@@ -267,13 +278,15 @@ int recDelete(Table *table, KeySpace1 *ks1) {
         return 0;
     }
 	KeySpace1 *ptr = table->ks1;
+	KeySpace1 *ptr_next;
 	while (ptr) {
+		if (ptr) {
+                        ptr_next = ptr->next;
+                }
 		if (ptr->par == ks1->key) {
 			recDelete(table, ptr);
 		}
-		if (ptr) {
-			ptr = ptr->next;
-		}
+		ptr = ptr_next;
 	}
     Item *toremove1 = NULL, *toremove2 = NULL;
     int errcode = ks2Remove(table->ks2, ks1->info->key2, table->msize2, &toremove2, 1);
@@ -287,7 +300,7 @@ int recDelete(Table *table, KeySpace1 *ks1) {
     if (toremove1 != toremove2) {
         return 6;
     }
-    errcode = ItemDelete(toremove1);
+    errcode = ItemClear(toremove1);
     return errcode;
 }
 
