@@ -93,12 +93,14 @@ int tabSearch(Table *table, KeyType1 key1, KeyType2 key2) {
 	}
 	Item *ans;
 	ans = table->ks1->info;
-	//while (ans->key1 != key2) {
-		int errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
-		if (errcode) {
-			return errcode;
-		}
-	//}
+	int errcode;
+	errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
+	if (errcode) {
+		return errcode;
+	}
+	if (ans->key1 != key1) {
+		return 4;
+	}
 	Table *cop = (Table*) malloc(sizeof(Table));
 	if (!cop) {
 		return 2;
@@ -179,15 +181,15 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode) {// 1 - k
 			if (errcode) {
 				tabClear(cop);
 				return errcode;
-            			}
+            }
 			break;
 		}
-        	case 2: {
+        case 2: {
 			errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
-            		if (errcode) {
+            if (errcode) {
 				tabClear(cop);
-                		return errcode;
-            		}
+             	return errcode;
+            }
 			break;
 		}
 	}
@@ -210,13 +212,13 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode) {// 1 - k
 		ans = ans->next;
 		errcode = tabInsert(cop, 0, item);
 	    if (errcode) {
-		tabClear(cop);
+			tabClear(cop);
         	return errcode;
         }
 	}
 	errcode = tabPrint(cop);
     if (errcode) {
-	tabClear(cop);
+		tabClear(cop);
         return errcode;
     }
 	errcode = tabClear(cop);
@@ -241,23 +243,23 @@ int parSearch(Table *table, KeyType1 par) {
             while (ans) {
                 InfoType *info = (InfoType*) malloc(sizeof(InfoType));
                 if (!info) {
-			tabClear(cop);
+					tabClear(cop);
                     return 2;
                 }
                 Item *item = (Item*) malloc(sizeof(Item));
                 if (!item) {
                     free(info);
-			tabClear(cop);
+					tabClear(cop);
                     return 2;
                 }
                 memcpy(info, ans->info, sizeof(InfoType));
                 memcpy(item, ans, sizeof(Item));
                 item->info = info;
-		item->next = NULL;
+				item->next = NULL;
                 ans = ans->next;
                 errcode = tabInsert(cop, 0, item);
                 if (errcode) {
-			tabClear(cop);
+					tabClear(cop);
                     return errcode;
                 }
             }
