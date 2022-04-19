@@ -9,6 +9,7 @@ int getsizeofks2(int *size) {
             return 3;
         }
         if (*size > 0){
+		scanf("%*[^\n]");
             break;
         }
         scanf("%*[^\n]");
@@ -26,6 +27,7 @@ int menu(int *id) {
 			return 3;
 		}
 		if (*id >= 0 && *id <=8){
+			scanf("%*[^\n]");
 			break;
 		}
         scanf("%*[^\n]");
@@ -92,6 +94,7 @@ int dInsert(Table *table) {
 			return 3;
 		}
 		if (k == 7) {
+			scanf("%*[^\n]");
 			break;
 		}
         scanf("%*[^\n]");
@@ -126,6 +129,7 @@ int dRemove(Table *table) {
 			return 3;
 		}
 		if (k == 2) {
+			scanf("%*[^\n]");
 			break;
 		}
         scanf("%*[^\n]");
@@ -149,6 +153,7 @@ int dSearch(Table *table) {
                 return 3;
         }
         if (k == 2) {
+		scanf("%*[^\n]");
                 break;
         }
         scanf("%*[^\n]");
@@ -173,6 +178,7 @@ int dSearchAny(Table *table) {
         	    	return 3;
         	}
         	if (k > 0 && (mode == 1 || mode == 2)) {
+			scanf("%*[^\n]");
         	    	break;
         	}
         	scanf("%*[^\n]");
@@ -187,6 +193,7 @@ int dSearchAny(Table *table) {
     	        return 3;
     	    }
     	    if (k > 0) {
+		scanf("%*[^\n]");
     	        break;
     	    }
         	scanf("%*[^\n]");
@@ -201,6 +208,7 @@ int dSearchAny(Table *table) {
     	        return 3;
     	    }
     	    if (k > 0) {
+		scanf("%*[^\n]");
     	        break;
     	    }
         	scanf("%*[^\n]");
@@ -226,6 +234,7 @@ int dRemoveAny(Table *table) {
             return 3;
         }
         if (k > 0 && (mode == 1 || mode == 2)) {
+		scanf("%*[^\n]");
             break;
         }
         scanf("%*[^\n]");
@@ -240,6 +249,7 @@ int dRemoveAny(Table *table) {
                 return 3;
             }
             if (k > 0) {
+		scanf("%*[^\n]");
                 break;
             }
         	scanf("%*[^\n]");
@@ -259,6 +269,7 @@ int dRemoveAny(Table *table) {
                 return 3;
             }
             if (k > 0) {
+		scanf("%*[^\n]");
                 break;
             }
         	scanf("%*[^\n]");
@@ -287,6 +298,7 @@ int dparSearch(Table *table) {
             return 3;
         }
         if (k == 1) {
+		scanf("%*[^\n]");
             break;
         }
         scanf("%*[^\n]");
@@ -309,6 +321,7 @@ int dmultRemove(Table *table) {
             return 3;
         }
         if (k == 1) {
+		scanf("%*[^\n]");
             break;
         }
         scanf("%*[^\n]");

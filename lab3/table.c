@@ -144,8 +144,15 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2, int mode) {
 	if (!table) {
 		return 1;
 	}
-	Item *toremove1 = NULL, *toremove2 = NULL;
-	int errcode = ks2Remove(table->ks2, key2, table->msize2, &toremove2, mode);
+	Item *toremove1 = NULL, *toremove2 = NULL, *ans;
+	int errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
+        if (errcode) {
+                return errcode;
+        }
+        if (ans->key1 != key1) {
+                return 4;
+        }
+	errcode = ks2Remove(table->ks2, key2, table->msize2, &toremove2, mode);
 	if (errcode) {
 		return errcode;
 	}
@@ -156,10 +163,40 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2, int mode) {
 	if (toremove1 != toremove2) {
 		return 6;
 	}
+	KeySpace1 *ptr = table->ks1;
+	int needfix = 0;
+        if (!(ans->next)) {
+                while (ptr) {
+                        if (ptr->par == key1) {
+                                ptr->par = 0;
+                        }
+                        ptr = ptr->next;
+                }
+        } else {
+		ans = ans->next;
+		needfix = 1;
+	}
 	if (mode) {
 		errcode = ItemClear(toremove1);
 	} else {
 		errcode = ItemDelete(toremove1);
+		if (errcode) {
+			return errcode;
+		}
+		if (needfix) {
+			errcode = ItemReleaseFixer(ans);
+		}
+		if (errcode) {
+			return errcode;
+		}
+	}
+	if (!(table->ks1)) {
+		KeySpace1 *ks1;
+		errcode = ks1InitCreate(&ks1);
+		if (errcode) {
+			return errcode;
+		}
+		table->ks1 = ks1;
 	}
     return errcode;
 }
@@ -321,5 +358,13 @@ int multRemove(Table *table, KeyType1 key1) {
         }
     }
     int errcode = recDelete(table, ptr);
+	 if (!(table->ks1)) {
+                KeySpace1 *ks1;
+                errcode = ks1InitCreate(&ks1);
+                if (errcode) {
+                        return errcode;
+                }
+                table->ks1 = ks1;
+        }
     return errcode;
 }
