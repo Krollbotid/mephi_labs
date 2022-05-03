@@ -37,7 +37,7 @@ int menu(int *id) {
 }
 
 char **errarray() {
-	char **arr = (char**) malloc(52 * sizeof(char*));
+	char **arr = (char**) malloc(62 * sizeof(char*));
 	arr[0] = "Success";
 	arr[1] = "Zero in non-zero argument";
 	arr[2] = "Out of memory";
@@ -53,10 +53,11 @@ char **errarray() {
 	arr[21] = "ks1 restriction - element with parent key was not found";
 	arr[22] = "ks1 - failed keyspace1 delete";
 	arr[23] = "ks1 - new version\'s of element parent key is not the same as first version\'s of that element parent key";
-    arr[24] = "ks1 - table is empty";
+	arr[24] = "ks1 - table is empty";
 	arr[30] = "ks2 restriction - no elements with the same keys";
 	arr[32] = "ks2 - failed keyspace1 delete";
 	arr[51] = "dialog - out of errmessages array";
+	arr[61] = "file - can't open file");
 	return arr;
 }
 

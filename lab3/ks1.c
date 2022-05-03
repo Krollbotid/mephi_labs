@@ -16,7 +16,7 @@ int ks1InitCreate (KeySpace1 **where) {
 		return 2;
 	}
 	(*where)->info = NULL;
-    (*where)->next = NULL;
+	(*where)->next = NULL;
 	return 0;
 }
 
@@ -34,7 +34,6 @@ int ks1Insert(KeySpace1 **ks1, KeyType1 par, Item *info, Item **ans) {
 		ptr->par = par;
 		ptr->info = info;
 		ptr->next = NULL;
-		info->p1 = (PointerType1*) ptr;
 		*ans = NULL;
 		return 0;
 	}
@@ -44,7 +43,6 @@ int ks1Insert(KeySpace1 **ks1, KeyType1 par, Item *info, Item **ans) {
 			if (ptr->info->key2 == info->key2) {
 				if (ptr->par == par) {
                 			*ans = ptr->info;
-					info->p1 = ptr;
 					return 0;
 				}
 				return 23;
@@ -69,7 +67,6 @@ int ks1Insert(KeySpace1 **ks1, KeyType1 par, Item *info, Item **ans) {
 	ptr->key = key;
 	ptr->par = par;
 	ptr->info = info;
-	info->p1 = ptr;
 	return 0; // success
 }
 
@@ -141,19 +138,19 @@ int ks1Print(KeySpace1 *ks1) {
 		return 1;
 	}
 	printf("By KeySpace1:\n");
-    if(!(ks1->info)) {
-        return 24;
-    }
+	if(!(ks1->info)) {
+        	return 24;
+	}
 	int errcode;
 	while (ks1) {
-        printf("Key:%5.2f Parent key:%5.2f\n", ks1->key, ks1->par);
-        printf("\n");
+        	printf("Key:%5.2f Parent key:%5.2f\n", ks1->key, ks1->par);
+        	printf("\n");
 		errcode = ItemPrint(ks1->info);
 		if (errcode) {
 			return errcode;
 		}
 		ks1 = ks1->next;
-        printf("\n");
+        	printf("\n");
 	}
 	return 0;
 }

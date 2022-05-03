@@ -14,12 +14,10 @@ typedef int KeyType2;
 typedef void PointerType1;
 
 typedef struct Item {
-	InfoType *info;
+	int next;
 	RelType release;
-	struct Item *next;
 	KeyType1 key1;
 	KeyType2 key2;
-	PointerType1 *p1;
 } Item;
 
 int ItemDelete(Item *whom);

@@ -19,14 +19,7 @@ int KeyType2Delete(KeyType2 *whom) {
 	return 0;
 }
 
-int PointerType1Delete(PointerType1 *whom) {
-	return 0;
-}
-
 int ItemDelete(Item *whom) {
-	if (InfoTypeDelete(whom->info)) {
-		return 11;
-	}
 	if (RelTypeDelete(&(whom->release))) {
 		return 12;
 	}
@@ -36,14 +29,11 @@ int ItemDelete(Item *whom) {
 	if (KeyType2Delete(&(whom->key2))) {
 		return 14;
 	}
-	if (PointerType1Delete(&(whom->p1))) {
-		return 15;
-	}
 	free(whom);
 	return 0;
 }
 
-int ItemClear(Item *src) {
+int ItemClear(char *nameoffile, Item *src) {
 	if (!src) {
 		return 0;
 	}
@@ -58,7 +48,7 @@ int ItemClear(Item *src) {
 	return 0;
 }
 
-int ItemReleaseFixer(Item *first) {
+int ItemReleaseFixer(char *nameoffile, Item *first) {
 	if (!first) {
 		return 1;
 	}
@@ -72,7 +62,7 @@ int ItemReleaseFixer(Item *first) {
 	return 0;
 }
 
-int ItemReleaseInsert(Item *first, Item *newitem) {
+int ItemReleaseInsert(char *nameoffile, Item *first, Item *newitem) {
 	if (!first) {
 		return 1;
 	}
@@ -80,7 +70,7 @@ int ItemReleaseInsert(Item *first, Item *newitem) {
 		first = first->next;
 	}
 	first->next = newitem;
-    newitem->release = first->release + 1;
+    	newitem->release = first->release + 1;
 	return 0;
 }
 
