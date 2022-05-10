@@ -42,7 +42,7 @@ int ks1Insert(KeySpace1 **ks1, KeyType1 par, Item *info, Item **ans) {
 		if (ptr->key == key) {
 			if (ptr->info->key2 == info->key2) {
 				if (ptr->par == par) {
-                			*ans = ptr->info;
+                	*ans = ptr->info;
 					return 0;
 				}
 				return 23;
@@ -133,24 +133,24 @@ int ks1Clear(KeySpace1 *src, int mode) {// 0 clear only KeySpace1, not 0 clear a
 	return 0;
 }
 
-int ks1Print(KeySpace1 *ks1) {
+int ks1Print(char *nameoffile, KeySpace1 *ks1) {
 	if (!ks1) {
 		return 1;
 	}
 	printf("By KeySpace1:\n");
 	if(!(ks1->info)) {
-        	return 24;
+        return 24;
 	}
 	int errcode;
 	while (ks1) {
-        	printf("Key:%5.2f Parent key:%5.2f\n", ks1->key, ks1->par);
-        	printf("\n");
-		errcode = ItemPrint(ks1->info);
+        printf("Key:%5.2f Parent key:%5.2f\n", ks1->key, ks1->par);
+        printf("\n");
+		errcode = ItemPrint(nameoffile, ks1->info);
 		if (errcode) {
 			return errcode;
 		}
 		ks1 = ks1->next;
-        	printf("\n");
+        printf("\n");
 	}
 	return 0;
 }

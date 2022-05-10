@@ -137,7 +137,7 @@ int ks2Clear(KeySpace2 *src, int msize2, int mode) {// 0 clear only KeySpace2, n
 	return 0;
 }
 
-int ks2Print(KeySpace2 *ks2, int msize2) {
+int ks2Print(KeySpace2 *ks2, int msize2, char *nameoffile) {
 	if (!ks2) {
 		return 1;
 	}
@@ -149,7 +149,7 @@ int ks2Print(KeySpace2 *ks2, int msize2) {
 		while (ptr) {
 			printf("Key:%d\n", ptr->key);
             printf("\n");
-			errcode = ItemPrint(ptr->info);
+			errcode = ItemPrint(nameoffile, ptr->info);
 			if (errcode) {
 				return errcode;
 			}

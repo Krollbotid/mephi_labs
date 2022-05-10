@@ -3,7 +3,7 @@
 #include "table.h"
 #include <stdio.h>
 
-int tabInit(Table *table, int msize2) {
+int tabInit(Table *table, int msize2, char *infofile, char *structurefile) {
 	if (!table) {
 		return 1;
 	}
@@ -14,11 +14,14 @@ int tabInit(Table *table, int msize2) {
     if (errcode) {
         return errcode;
     }
+	table->infofile = infofile;
+	table->structurefile = structurefile;
     errcode = ks2ArrCreate(msize2, &ks2);
     if (errcode) {
         ks1Clear(ks1, 1);
         return errcode;
     }
+	table->status = 0;
     table->ks1 = ks1;
     table->ks2 = ks2;
     table->msize2 = msize2;
@@ -42,7 +45,7 @@ int tabClear(Table *table) {
 	return 0;
 }
 
-int tabInsert(Table *table, KeyType1 par, Item *info) {
+int tabInsert(Table *table, KeyType1 par, Item *info, int mode, InfoType *infoinfo) {  // mode: 0 - do not insert also infotype, else - insert infotype.
 	if (!table) {
 		return 1;
 	}
@@ -65,6 +68,9 @@ int tabInsert(Table *table, KeyType1 par, Item *info) {
     } else {
         info->release = 1;
     }
+	if (mode) {
+		fInsertInfo(table->infofile, info, infoinfo);
+	}
 	return errcode;
 }
 
@@ -77,12 +83,12 @@ int tabPrint(Table *table) {
         printf("Table is empty.\n");
         return 0;
     }
-    int errcode = ks1Print(table->ks1);
+    int errcode = ks1Print(table->infofile, table->ks1);
     if (errcode) {
         return errcode;
     }
 	printf("\n");
-    errcode = ks2Print(table->ks2, table->msize2);
+    errcode = ks2Print(table->ks2, table->msize2, table->infofile);
     return errcode;
 }
 
@@ -104,38 +110,31 @@ int tabSearch(Table *table, KeyType1 key1, KeyType2 key2) {
 	Table *cop = (Table*) malloc(sizeof(Table));
 	if (!cop) {
 		return 2;
-	}
-	errcode = tabInit(cop, 1);
+	};
+	errcode = tabInit(cop, 1, table->infofile, NULL);
 	if (errcode) {
-        	return errcode;
+        return errcode;
 	}
 	while (ans) {
-		InfoType *info = (InfoType*) malloc(sizeof(InfoType));
-		if (!info) {
-			tabClear(cop);
-			return 2;
-		}
 		Item *item = (Item*) malloc(sizeof(Item));
 		if (!item) {
-            		free(info);
 			tabClear(cop);
 			return 2;
 		}
-		memcpy(info, ans->info, sizeof(InfoType));
 		memcpy(item, ans, sizeof(Item));
-		item->info = info;
+		item->info = ans->info;
 		item->next = NULL;
 		ans = ans->next;
-		errcode = tabInsert(cop, 0, item);
-	    	if (errcode) {
+		errcode = tabInsert(cop, 0, item, 0, NULL);
+	    if (errcode) {
 			tabClear(cop);
-        		return errcode;
-        	}
+        	return errcode;
+        }
 	}
 	errcode = tabPrint(cop);
-    	if (errcode) {
-        	return errcode;
-    	}
+    if (errcode) {
+        return errcode;
+    }
 	errcode = tabClear(cop);
 	return errcode;
 }
@@ -147,10 +146,10 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2, int mode) {
 	Item *toremove1 = NULL, *toremove2 = NULL, *ans;
 	int errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
         if (errcode) {
-                return errcode;
+            return errcode;
         }
         if (ans->key1 != key1) {
-                return 4;
+            return 4;
         }
 	errcode = ks2Remove(table->ks2, key2, table->msize2, &toremove2, mode);
 	if (errcode) {
@@ -165,14 +164,14 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2, int mode) {
 	}
 	KeySpace1 *ptr = table->ks1;
 	int needfix = 0;
-        if (!(ans->next)) {
-                while (ptr) {
-                        if (ptr->par == key1) {
-                                ptr->par = 0;
-                        }
-                        ptr = ptr->next;
-                }
-        } else {
+    if (!(ans->next)) {
+        while (ptr) {
+            if (ptr->par == key1) {
+                ptr->par = 0;
+            }
+            ptr = ptr->next;
+        }
+    } else {
 		ans = ans->next;
 		needfix = 1;
 	}
@@ -206,7 +205,7 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode) {// 1 - k
 		return 1;
 	}
 	Table *cop = (Table*) malloc(sizeof(Table));
-	int errcode = tabInit(cop, 1);
+	int errcode = tabInit(cop, 1, table->infofile, NULL);
 	if (errcode) {
 		tabClear(cop);
 		return errcode;
@@ -231,23 +230,16 @@ int tabSearchAny(Table *table, KeyType1 key1, KeyType2 key2, int mode) {// 1 - k
 		}
 	}
 	while (ans) {
-		InfoType *info = (InfoType*) malloc(sizeof(InfoType));
-		if (!info) {
-			tabClear(cop);
-			return 2;
-		}
 		Item *item = (Item*) malloc(sizeof(Item));
 		if (!item) {
-			free(info);
 			tabClear(cop);
 			return 2;
 		}
-		memcpy(info, ans->info, sizeof(InfoType));
 		memcpy(item, ans, sizeof(Item));
-		item->info = info;
+		item->info = ans->info;
 		item->next = NULL;
 		ans = ans->next;
-		errcode = tabInsert(cop, 0, item);
+		errcode = tabInsert(cop, 0, item, 0, NULL);
 	    if (errcode) {
 			tabClear(cop);
         	return errcode;
@@ -267,7 +259,7 @@ int parSearch(Table *table, KeyType1 par) {
         return 1;
     }
     Table *cop = (Table*) malloc(sizeof(Table));
-    int errcode = tabInit(cop, 1);
+    int errcode = tabInit(cop, 1, table->infofile, NULL);
     if (errcode) {
 	tabClear(cop);
         return errcode;
@@ -278,23 +270,16 @@ int parSearch(Table *table, KeyType1 par) {
         ans = ptr->info;
         if (ptr->par == par) {
             while (ans) {
-                InfoType *info = (InfoType*) malloc(sizeof(InfoType));
-                if (!info) {
-					tabClear(cop);
-                    return 2;
-                }
                 Item *item = (Item*) malloc(sizeof(Item));
                 if (!item) {
-                    free(info);
 					tabClear(cop);
                     return 2;
                 }
-                memcpy(info, ans->info, sizeof(InfoType));
                 memcpy(item, ans, sizeof(Item));
-                item->info = info;
+                item->info = ans->info;
 				item->next = NULL;
                 ans = ans->next;
-                errcode = tabInsert(cop, 0, item);
+                errcode = tabInsert(cop, 0, item, 0, NULL);
                 if (errcode) {
 					tabClear(cop);
                     return errcode;

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "dtable.h"
+#include "ftable.h"
 
 int main() {
     int ks2size = 0;
@@ -10,11 +11,23 @@ int main() {
 		errprint(2, arr);
 		return 0;
 	}
-	int work = 1, errcode = tabInit(table, ks2size), id;
+	int work = 1, errcode = tabInit(table, ks2size, "lab3b_INFODATA", "lab3b_STRUCTUREDATA"), id;
 	if (errcode) {
 		errprint(errcode, arr);
 		return 0;
 	}
+	int (*Tablefuncs[]) (Table *table) = {dInsert, 
+		dRemove,
+		tabPrint,
+		dSearch,
+		dSearchAny,
+		dRemoveAny,
+		dmultRemove,
+		dparSearch,
+		writeTableStructure,
+		readTableStructure,
+		rewriteTableData
+	};
 	while(work) {
 		errcode = menu(&id);
 		if (errcode) {
@@ -25,59 +38,13 @@ int main() {
 			}
 			return 0;
 		}
-		switch(id) {
-			case 1:
-                errcode = dInsert(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-				break;
-			case 2:
-                errcode = dRemove(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-				break;
-			case 3:
-				errcode = tabPrint(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-				break;
-			case 4:
-				errcode = dSearch(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-				break;
-			case 5:
-				errcode = dSearchAny(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-				break;
-            case 6:
-                errcode = dRemoveAny(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-                break;
-            case 7:
-                errcode = dmultRemove(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-                break;
-            case 8:
-                errcode = dparSearch(table);
-                if (errcode) {
-                    errprint(errcode, arr);
-                }
-                break;
-			case 0:
-				work = 0;
-				break;
+		if (!id) {
+			break;
 		}
+		errcode = Tablefuncs[id - 1];
+		if (errcode) {
+            errprint(errcode, arr);
+        }
 	}
 	errcode = tabClear(table);
 	if (errcode) {

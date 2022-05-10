@@ -57,7 +57,14 @@ char **errarray() {
 	arr[30] = "ks2 restriction - no elements with the same keys";
 	arr[32] = "ks2 - failed keyspace1 delete";
 	arr[51] = "dialog - out of errmessages array";
-	arr[61] = "file - can't open file");
+	arr[61] = "file - can't open file for reading";
+	arr[62] = "file - can't open file for writing";
+	arr[63] = "file - can't open file for adding";
+	arr[64] = "file - fseek error";
+	arr[65] = "file - fwrite error";
+	arr[66] = "file - fread error";
+	arr[67] = "file - no data in file";
+	arr[68] = "file - your table has already read data from file once. If you want to read again, you need to refresh table";
 	return arr;
 }
 
@@ -73,13 +80,9 @@ int dInsert(Table *table) {
 	if (!table) {
 		return 1;
 	}
-	InfoType *info = (InfoType*) malloc(sizeof(InfoType));
-	if (!info) {
-		return 2;
-	}
+	InfoType info;
 	Item *item = (Item*) malloc(sizeof(Item));
 	if (!item) {
-		free(info);
 		return 2;
 	}
 	int k = -1, tbegin, tend, count;
@@ -90,7 +93,6 @@ int dInsert(Table *table) {
         printf("Please input tbegin, tend, count, divided, key1, par, key2 in following format:\ntbegin/tend/count/divided/key1/par/key2\nWhere tbegin,tend,count,key2 are integer; divided,key1,par are float.\nInput:");
 		k = scanf("%d/%d/%d/%f/%f/%f/%d", &tbegin, &tend, &count, &divided, &key1, &par, &key2);
 		if (k < 0) {
-			free(info);
 			free(item);
 			return 3;
 		}
@@ -101,15 +103,15 @@ int dInsert(Table *table) {
         scanf("%*[^\n]");
 		printf("\nIncorrect input. Please try again.\n");
 	}
-	info->tbegin = tbegin;
-	info->count = count;
-	info->divided = divided;
-	info->tend = tend;
-	item->info = info;
+	info.tbegin = tbegin;
+	info.count = count;
+	info.divided = divided;
+	info.tend = tend;
+	item->par = par;
 	item->key1 = key1;
 	item->key2 = key2;
 	item->next = NULL;
-	int errcode = tabInsert(table, par, item);
+	int errcode = tabInsert(table, par, item, 1, &info);
 	if (errcode) {
 		ItemDelete(item);
 	}
