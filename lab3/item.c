@@ -73,9 +73,18 @@ int fInsertInfo(char *nameoffile, Item *item, InfoType *info) {
 	if (!nameoffile || !item) {
 		return 1;
 	}
-	FILE *fp = fopen(nameoffile, "ab");
+	FILE *fp = fopen(nameoffile, "r+b");
 	if (!fp) {
 		return 63;
+	}
+	int status = 1;
+	if (fseek(fp, 0, SEEK_SET)) {
+		fclose(fp);
+		return 64;
+	}
+	if (fwrite(&status, sizeof(int), 1, fp) != 1) {
+		fclose(fp);
+		return 65;
 	}
 	if (fseek(fp, 0, SEEK_END)) {
 		fclose(fp);
@@ -87,16 +96,6 @@ int fInsertInfo(char *nameoffile, Item *item, InfoType *info) {
 	}
 	item->info = ftell(fp) - sizeof(InfoType);
 	fclose(fp);
-	fp = fopen(nameoffile, "rb");
-	if (!fp) {
-		return 63;
-	}
-	int status = 1;
-	if (fwrite(&status, sizeof(int), 1, fp) != 1) {
-		fclose(fp);
-		return 65;
-	}
-	fclose(fp);
 	return 0;
 }
 
@@ -104,19 +103,22 @@ int fGetInfo(char *nameoffile, Item *item, InfoType *info) {
 	if (!nameoffile || !item) {
 		return 1;
 	}
-	FILE *fp = fopen(nameoffile, "rb");
+	FILE *fp = fopen(nameoffile, "r+b");
 	if (!fp) {
 		return 61;
 	}
 	int status;
-	if (fread(&status, sizeof(InfoType), 1, fp) != 1) {
+	if (fseek(fp, item->info, SEEK_SET)) {
+		fclose(fp);
+		return 64;
+	}
+	if (fread(&status, sizeof(int), 1, fp) != 1) {
 		fclose(fp);
 		return 66;
 	}
-	if (status) {
+	if (!status) {
 		fclose(fp);
-		return 67
-		;
+		return 67;
 	}
 	if (fseek(fp, item->info, SEEK_SET)) {
 		fclose(fp);

@@ -2,42 +2,42 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int getsizeofks2(int *size) {
-    while (*size <= 0) {
-        printf("Please, enter size of KeySpace2 (natural number):");
-        if(scanf("%d", size) < 0) {
+int getInt(int start, int end, int *ans) {// get int in [start, end)
+	char *errmsg = "";
+	do {
+		printf(errmsg);
+		errmsg = "Incorrect input. Please try again.";
+        if (scanf("%d", ans) < 0) {
             return 3;
         }
-        if (*size > 0){
 		scanf("%*[^\n]");
-            break;
-        }
-        scanf("%*[^\n]");
-        printf("Incorrect input. Please try again.\n");
-    }
-    return 0;
+		scanf("%*c");
+	} while (*ans >=end || *ans < start);
+	return 0;
 }
 
-int menu(int *id) {
-    printf("Menu:\n0.Exit\n1.Insert into table.\n2.Remove out of table.\n3.Print table to console.\n4.Search elements by compound key.\n5.Search elements by non-compound key.\n6.Remove all elements by non-compound key.\n7.Recursive removing of elements by key1.\n8.Search all elements by parent key.\n");
-	*id = -1;
-	while (*id < 0 || *id > 8) {
-        printf("Please, enter id of menu:");
-		if(scanf("%d", id) < 0) {
-			return 3;
-		}
-		if (*id >= 0 && *id <=8){
-			scanf("%*[^\n]");
-			break;
-		}
-        scanf("%*[^\n]");
-		printf("Incorrect input. Please try again.\n");
+int getsizeofks2(int *size) {
+    printf("Please, enter size of KeySpace2 (natural number, 0 < size < 1001):");
+	int errcode = getInt(1, 100, size);
+    return errcode;
+}
+
+int menu(const char *options[], const int N, int *id) {
+    printf("Menu:\n");
+	int i;
+	for(i = 0; i < N; i++) {
+		puts(options[i]);
+	}
+	printf("Print menu option number:");
+	int errcode = getInt(0, N, id);
+	if (errcode) {
+		return errcode;
 	}
 	return 0;
 }
 
 char **errarray() {
-	char **arr = (char**) malloc(62 * sizeof(char*));
+	char **arr = (char**) malloc(69 * sizeof(char*));
 	arr[0] = "Success";
 	arr[1] = "Zero in non-zero argument";
 	arr[2] = "Out of memory";
@@ -69,7 +69,7 @@ char **errarray() {
 }
 
 int errprint(int errcode, char **arr) {
-	if (errcode > 52) {
+	if (errcode > 68) {
 		errcode = 51;
 	}
 	printf("%s\n", arr[errcode]);
@@ -98,9 +98,11 @@ int dInsert(Table *table) {
 		}
 		if (k == 7) {
 			scanf("%*[^\n]");
+			scanf("%*c");
 			break;
 		}
         scanf("%*[^\n]");
+		scanf("%*c");
 		printf("\nIncorrect input. Please try again.\n");
 	}
 	info.tbegin = tbegin;
@@ -133,9 +135,11 @@ int dRemove(Table *table) {
 		}
 		if (k == 2) {
 			scanf("%*[^\n]");
+			scanf("%*c");
 			break;
 		}
         scanf("%*[^\n]");
+		scanf("%*c");
 		printf("\nIncorrect input. Please try again.\n");
 	}
 	int errcode = tabRemove(table, key1, key2, 0);
@@ -156,10 +160,12 @@ int dSearch(Table *table) {
                 return 3;
         }
         if (k == 2) {
-		scanf("%*[^\n]");
-                break;
+			scanf("%*[^\n]");
+			scanf("%*c");
+            break;
         }
         scanf("%*[^\n]");
+		scanf("%*c");
         printf("\nIncorrect input. Please try again.\n");
     }
     int errcode = tabSearch(table, key1, key2);
@@ -174,32 +180,22 @@ int dSearchAny(Table *table) {
 	int k = -1, mode = -1;
 	KeyType1 key1 = 0;
 	KeyType2 key2 = 0;
-	while (k < 1 || (mode > 2 || mode < 1)) {
-		mode = -1;
-	        k = scanf("%d", &mode);
-        	if (k < 0) {
-        	    	return 3;
-        	}
-        	if (k > 0 && (mode == 1 || mode == 2)) {
-			scanf("%*[^\n]");
-        	    	break;
-        	}
-        	scanf("%*[^\n]");
-        	printf("\nIncorrect input. Please try again.\n");
-    	}
+	getInt(1, 2 + 1, &mode);
 	if (mode == 1) {
 		printf("Please input key1 (float)\nInput:");
-        	k = -1;
+        k = -1;
 		while (k < 1) {
     	    k = scanf("%f", &key1);
     	    if (k < 0) {
     	        return 3;
     	    }
     	    if (k > 0) {
-		scanf("%*[^\n]");
+				scanf("%*[^\n]");
+				scanf("%*c");
     	        break;
     	    }
         	scanf("%*[^\n]");
+			scanf("%*c");
     	    printf("\nIncorrect input. Please try again.\n");
     	}
 	} else {
@@ -211,10 +207,12 @@ int dSearchAny(Table *table) {
     	        return 3;
     	    }
     	    if (k > 0) {
-		scanf("%*[^\n]");
+				scanf("%*[^\n]");
+				scanf("%*c");
     	        break;
     	    }
         	scanf("%*[^\n]");
+			scanf("%*c");
     	    printf("\nIncorrect input. Please try again.\n");
     	}
 	}
@@ -237,10 +235,12 @@ int dRemoveAny(Table *table) {
             return 3;
         }
         if (k > 0 && (mode == 1 || mode == 2)) {
-		scanf("%*[^\n]");
+			scanf("%*[^\n]");
+			scanf("%*c");
             break;
         }
         scanf("%*[^\n]");
+		scanf("%*c");
         printf("\nIncorrect input. Please try again.\n");
     }
     if (mode == 1) {
@@ -252,10 +252,12 @@ int dRemoveAny(Table *table) {
                 return 3;
             }
             if (k > 0) {
-		scanf("%*[^\n]");
+				scanf("%*[^\n]");
+				scanf("%*c");
                 break;
             }
         	scanf("%*[^\n]");
+			scanf("%*c");
             printf("\nIncorrect input. Please try again.\n");
         }
         errcode = ks1Search(table->ks1, key1, &ans);
@@ -272,10 +274,12 @@ int dRemoveAny(Table *table) {
                 return 3;
             }
             if (k > 0) {
-		scanf("%*[^\n]");
+				scanf("%*[^\n]");
+				scanf("%*c");
                 break;
             }
         	scanf("%*[^\n]");
+			scanf("%*c");
             printf("\nIncorrect input. Please try again.\n");
         }
         errcode = ks2Search(table->ks2, table->msize2, key2, &ans);
@@ -301,10 +305,12 @@ int dparSearch(Table *table) {
             return 3;
         }
         if (k == 1) {
-		scanf("%*[^\n]");
+			scanf("%*[^\n]");
+			scanf("%*c");
             break;
         }
         scanf("%*[^\n]");
+		scanf("%*c");
         printf("\nIncorrect input. Please try again.\n");
     }
     int errcode = parSearch(table, par);
@@ -324,10 +330,12 @@ int dmultRemove(Table *table) {
             return 3;
         }
         if (k == 1) {
-		scanf("%*[^\n]");
+			scanf("%*[^\n]");
+			scanf("%*c");
             break;
         }
         scanf("%*[^\n]");
+		scanf("%*c");
         printf("\nIncorrect input. Please try again.\n");
     }
     int errcode = multRemove(table, key1);

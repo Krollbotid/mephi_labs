@@ -85,7 +85,20 @@ int ks1Search(KeySpace1 *ks1, KeyType1 key, Item **ans) {
 	return 0;
 }
 
-int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode) { // mode == 0 remove first release, otherwise all releases
+int ks1MakeParZero(KeySpace1 *ks1, KeyType1 par) {
+	if (!ks1 || !par) {
+		return 1;
+	}
+	while(ks1) {
+		if (ks1->par == par) {
+			ks1->par = 0;
+		}
+		ks1 = ks1->next;
+	}
+	return 0;
+}
+
+int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode, int makezero) { // mode == 0 remove first release, otherwise all releases
 	if (!ks1 || !(*ks1) || !key) {
 		return 1;
 	}
@@ -108,6 +121,11 @@ int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode) { // mode == 
 		}
 		if (ks1Delete(ptr)) {
 			return 22;
+		}
+		if (makezero) {
+			if (ks1MakeParZero(*ks1, key)) {
+				return 6;
+			}
 		}
 	}
 	return 0;

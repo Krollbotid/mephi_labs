@@ -14,7 +14,7 @@ int ks1InitCreate (KeySpace1 **where);
 int ks1Clear(KeySpace1 *src, int mode);
 int ks1Search(KeySpace1 *ks1, KeyType1 key, Item **ans);
 int ks1Insert(KeySpace1 **ks1, KeyType1 par, Item *info, Item **ans);
-int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode);
+int ks1Remove(KeySpace1 **ks1, KeyType1 key, Item **ans, int mode, int makezero);
 int ks1Print(char *nameoffile, KeySpace1 *ks1);
 
 #endif

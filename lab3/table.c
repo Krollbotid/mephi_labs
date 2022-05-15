@@ -68,8 +68,11 @@ int tabInsert(Table *table, KeyType1 par, Item *info, int mode, InfoType *infoin
     } else {
         info->release = 1;
     }
+	if (errcode) {
+		return errcode;
+	}
 	if (mode) {
-		fInsertInfo(table->infofile, info, infoinfo);
+		errcode = fInsertInfo(table->infofile, info, infoinfo);
 	}
 	return errcode;
 }
@@ -155,7 +158,7 @@ int tabRemove(Table *table, KeyType1 key1, KeyType2 key2, int mode) {
 	if (errcode) {
 		return errcode;
 	}
-	errcode = ks1Remove(&(table->ks1), key1, &toremove1, mode);
+	errcode = ks1Remove(&(table->ks1), key1, &toremove1, mode, 1);
 	if (errcode) {
 		return errcode;
 	}
@@ -305,8 +308,8 @@ int recDelete(Table *table, KeySpace1 *ks1) {
 	KeySpace1 *ptr_next;
 	while (ptr) {
 		if (ptr) {
-                        ptr_next = ptr->next;
-                }
+            ptr_next = ptr->next;
+        }
 		if (ptr->par == ks1->key) {
 			recDelete(table, ptr);
 		}
@@ -317,7 +320,7 @@ int recDelete(Table *table, KeySpace1 *ks1) {
     if (errcode) {
         return errcode;
     }
-    errcode = ks1Remove(&(table->ks1), ks1->key, &toremove1, 1);
+    errcode = ks1Remove(&(table->ks1), ks1->key, &toremove1, 1, 0);
     if (errcode) {
         return errcode;
     }
@@ -343,13 +346,13 @@ int multRemove(Table *table, KeyType1 key1) {
         }
     }
     int errcode = recDelete(table, ptr);
-	 if (!(table->ks1)) {
-                KeySpace1 *ks1;
-                errcode = ks1InitCreate(&ks1);
-                if (errcode) {
-                        return errcode;
-                }
-                table->ks1 = ks1;
+	if (!(table->ks1)) {
+        KeySpace1 *ks1;
+        errcode = ks1InitCreate(&ks1);
+        if (errcode) {
+            return errcode;
         }
+        table->ks1 = ks1;
+    }
     return errcode;
 }

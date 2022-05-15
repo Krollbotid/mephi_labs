@@ -3,7 +3,9 @@ CC=gcc
 CFLAGS = -c -g -Wall
 
 LDFLAGS =
-SRCS = main.c item.c ks1.c ks2.c table.c dtable.c
+SRCS = main.c item.c ks1.c ks2.c table.c dtable.c ftable.c
+
+DATAS = lab3bINFODATA lab3bSTRUCTUREDATA
 
 OBJS = $(SRCS:.c=.o)
 
@@ -19,3 +21,6 @@ $(EXE): $(OBJS)
 
 clean:
 	rm -rf $(OBJS)
+
+cleandata:
+	rm -rf $(DATAS)
