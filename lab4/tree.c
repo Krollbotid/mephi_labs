@@ -1,6 +1,35 @@
 #include "tree.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+char *freadline(FILE *fp) {
+	char buf[80 + 1] = {0}; //#define bufsiz 80
+	char *ans = NULL;
+	int len = 0, n = 0;
+	do {
+		n = fscanf(fp, "%80[^\n]",buf);
+		if (n < 0){
+			if(!ans){
+				return NULL;
+			}
+		} else if (n > 0) {
+			int buf_len = strlen(buf);
+			int str_len = len + buf_len;
+			ans = (char*) realloc(ans, (str_len + 1) * sizeof(char));
+			strncpy(ans+len, buf, buf_len);
+			len = str_len;
+		} else {
+			fscanf(fp, "%*c");
+		}
+	} while (n > 0);
+	if (len > 0){
+		ans[len] = '\0';
+	} else {
+		ans = (char*) calloc(1, sizeof(char));
+	}
+	return ans;
+}
 
 Node *TreeMinNode(Node *node) {
 	if (!node) {
@@ -8,6 +37,16 @@ Node *TreeMinNode(Node *node) {
 	}
 	while (node->left) {
 		node = node->left;
+	}
+	return node;
+}
+
+Node *TreeMaxNode(Node *node) {
+	if (!node) {
+		return NULL;
+	}
+	while (node->right) {
+		node = node->right;
 	}
 	return node;
 }
@@ -30,7 +69,7 @@ int NodeDelete(Node *node) {
 	return 0;
 }
 
-int TreeInsert(Node **tree, Node *node) {
+int TreeInsert(Node **tree, Node *node, Info *info) {
 	if (!tree) {
 		return 1;
 	}
@@ -43,6 +82,8 @@ int TreeInsert(Node **tree, Node *node) {
 		par = ptr;
 		int k = strcmp(node->key, ptr->key);
 		if (!k) {
+			*info = ptr->info;
+			ptr->info = node->info;
 			return 11;  // tree - can't elements with the same keys;
 		}
 		if (k > 0) {
@@ -51,7 +92,7 @@ int TreeInsert(Node **tree, Node *node) {
 			ptr = ptr->left;
 		}
 	}
-	if (strcmp(node->key, ptr->key) > 0) {
+	if (strcmp(node->key, par->key) > 0) {
 		par->right = node;
 	} else {
 		par->left = node;
@@ -69,14 +110,14 @@ int TreeDelete(Node **tree, KeyType *key) {
 	}
 	Node *ptr = *tree;
 	while (ptr) {
-		int k  = strcmp(node->key, ptr->key);
+		int k  = strcmp(key, ptr->key);
 		if (!k) {
 			break;
 		}
 		if (k > 0) {
 			ptr = ptr->right;
 		} else {
-			ptr = ptr-> left;
+			ptr = ptr->left;
 		}
 	}
 	if (!ptr) {
@@ -113,13 +154,69 @@ int TreeDelete(Node **tree, KeyType *key) {
 	return 0;
 }
 
-int recGoandPrint(Node *node) {
-	if (node->left) {
-		recGoandPrint(node->left);
+Node **recTreeSearch(Node *node, Node **arr, int *size, int *errcode) {
+	if (!node) {
+		*errcode = 1;
+		return NULL;
 	}
+	if (node->left && !(strcmp(node->left->key, node->key))) {
+		arr = recTreeSearch(node->left, arr, size, errcode);
+		if (errcode) {
+			return NULL;
+		}
+	}
+	arr = (Node**) realloc(arr, (*size + 1) * sizeof(Node*));
+	arr[*size] = node->right;
+	*size = *size + 1;
+	if (node->left && !(strcmp(node->right->key, node->key))) {
+		arr = recTreeSearch(node->right, arr, size, errcode);
+		if (errcode) {
+			return NULL;
+		}
+	}
+	return arr;
+}
+
+Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode) {
+	if (!tree) {
+		*errcode = 13;
+		return NULL;
+	}
+	while (tree) {
+		int k  = strcmp(key, tree->key);
+		if (!k) {
+			break;
+		}
+		if (k > 0) {
+			tree = tree->right;
+		} else {
+			tree = tree->left;
+		}
+	}
+	if (!tree) {
+		*errcode = 4;
+		return NULL;
+	}
+	Node **arr = recTreeSearch(tree, NULL, &size, errcode);
+	if (*errcode) {
+		free(arr);
+		arr = NULL;
+	}
+	return arr;
+}
+
+int PrintNode(Node *node) {
 	printf("key:%s info:%u\n", node->key, node->info);
+	return 0;
+}
+
+int recReverseGoandPrint(Node *node) {
 	if (node->right) {
-		recGoandPrint(node->right);
+		recReverseGoandPrint(node->right);
+	}
+	PrintNode(node);
+	if (node->left) {
+		recReverseGoandPrint(node->left);
 	}
 	return 0;
 }
@@ -132,7 +229,7 @@ int TreeGoAround(Node **tree) {
 		return 13; // tree is empty!
 	}
 	printf("Printing tree:\n");
-	recGoandPrint(tree);
+	recReverseGoandPrint(*tree);
 	return 0;
 }
 
@@ -147,10 +244,119 @@ int recTreeClear(Node *node) {
 }
 
 int TreeClear(Node **tree) {
-	if (!tree || !(*tree)) {
+	if (!tree) {
+		return 1;
+	}
+	if (!(*tree)) {
 		return 0;
 	}
 	recTreeClear(*tree);
 	*tree = NULL;
 	return 0;
+}
+
+int PrintTree(Node *tree) {
+	if (!tree) {
+		return 1;
+	}
+}
+
+int recTreeGoandMark (Node *node, int *count, KeyType *key, int *ans) {
+	if (node->left) {
+		recTreeGoandMark(node->left, count, key, ans);
+	}
+	*count = *count + 1;
+	if (!(strcmp(key, node->key))) {
+		*ans = *count;
+	}
+	if (node->right) {
+		recTreeGoandMark(node->right, count, key, ans);
+	}
+	return 0;
+}
+
+int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
+	if (!key || !ans) {
+		return 1;
+	}
+	if (!tree) {
+		return 13;
+	}
+	int count = 0, ansnum;
+	recTreeGoandMark(tree, &count, key, &ansnum);
+	if (count == 1) {
+		*ans = tree;
+		return 0;
+	}
+	if (count - ansnum > ansnum - 1) {
+		*ans = TreeMaxNode(tree);
+	} else {
+		*ans = TreeMinNode(tree);
+		if (count - ansnum == ansnum - 1) {
+			ans++;
+			*ans = TreeMaxNode;
+		}
+	}
+	return 0;
+}
+
+int recPrintbyLevel(Node *node, int depth) {
+	if (node->left) {
+		recPrintbyLevel(node->left, depth + 1);
+	}
+	int i;
+	for (i = 0; i < depth; i++) {
+		printf("   ");
+	}
+	printf("%s\n", node->key);
+	if (node->right) {
+		recPrintbyLevel(node->right, depth + 1);
+	}
+	return 0;
+}
+
+int PrintTree(Node *tree) {
+	if (!tree) {
+		return 13;
+	}
+	recPrintbyLevel(tree, 0);
+	return 0;
+}
+
+int ReadTreefromFile(Node **tree, char *name) {
+	FILE *fp = fopen(name, "r");
+	while (1) {
+		Node *node = (Node*) malloc(sizeof(Node));
+		int k = fscanf(fp, "%u", &(node->info));
+		scanf("%*[^\n]");
+		scanf("%*c");
+		if (!k) {
+			free(node);
+			fclose(fp);
+			return 14;
+		}
+		if (k < 0) {
+			free(node);
+			fclose(fp);
+			return 0;
+		}
+		node->key = freadline(fp);
+		if (!(node->key)) {
+			NodeDelete(node);
+			fclose(fp);
+			return 14;
+		}
+		Info info;
+		int errcode = TreeInsert(tree, node, &info);
+		if (errcode) {
+			if (errcode == 11) {
+				printf("Info in node with key:%s has been replaced. Old info:%u\n", node->key, info);
+				errcode = 0;
+			}
+			NodeDelete(node);
+			if (errcode) {
+				return errcode;
+			}
+		}
+	}
 }

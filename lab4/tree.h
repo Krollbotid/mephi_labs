@@ -14,9 +14,14 @@ typedef struct Node {
 } Node;
 
 int NodeDelete(Node *node);
-int TreeInsert(Node **tree, Node *node);
-int TreeDelete(Node **tree, Keytype *key);
+int TreeInsert(Node **tree, Node *node, Info *info);
+int TreeDelete(Node **tree, KeyType *key);
 int TreeGoAround(Node **tree);
 int TreeClear(Node **tree);
+Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode);
+int PrintNode(Node *node);
+int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size);
+int PrintTree(Node *tree);
+int ReadTreefromFile(Node **tree, char *name);
 
 #endif
