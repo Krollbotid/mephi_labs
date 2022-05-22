@@ -12,7 +12,9 @@ int main() {
 		"3.Go around tree and print it to console.",
 		"4.Search elements in the tree by the key.",
 		"5.Search max ranged element from the element with entered key.",
-		"6.Print Tree by level."
+		"6.Print Tree by level.",
+		"7.Read tree from file.",
+		"8.Write tree to file for drawing graph."
 	};
 	int (*Treefuncs[]) (Node **tree) = {
 		NULL,
@@ -22,7 +24,8 @@ int main() {
 		DTreeSearch,
 		DTreeSpecialSearch,
 		PrintTree,
-		DReadTreefromFile
+		DReadTreefromFile,
+		WriteTreeforGraph
 	};
 	const int N = sizeof(menuoptions) / sizeof(menuoptions[0]);
 	int id = 1, errcode = 0;

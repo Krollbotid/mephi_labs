@@ -197,7 +197,7 @@ Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode) {
 		*errcode = 4;
 		return NULL;
 	}
-	Node **arr = recTreeSearch(tree, NULL, &size, errcode);
+	Node **arr = recTreeSearch(tree, NULL, size, errcode);
 	if (*errcode) {
 		free(arr);
 		arr = NULL;
@@ -255,12 +255,6 @@ int TreeClear(Node **tree) {
 	return 0;
 }
 
-int PrintTree(Node *tree) {
-	if (!tree) {
-		return 1;
-	}
-}
-
 int recTreeGoandMark (Node *node, int *count, KeyType *key, int *ans) {
 	if (node->left) {
 		recTreeGoandMark(node->left, count, key, ans);
@@ -294,7 +288,7 @@ int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
 		*ans = TreeMinNode(tree);
 		if (count - ansnum == ansnum - 1) {
 			ans++;
-			*ans = TreeMaxNode;
+			*ans = TreeMaxNode(tree);
 		}
 	}
 	return 0;
@@ -315,21 +309,27 @@ int recPrintbyLevel(Node *node, int depth) {
 	return 0;
 }
 
-int PrintTree(Node *tree) {
+int PrintTree(Node **tree) {
 	if (!tree) {
+		return 1;
+	}
+	if (!(*tree)) {
 		return 13;
 	}
-	recPrintbyLevel(tree, 0);
+	recPrintbyLevel(*tree, 0);
 	return 0;
 }
 
 int ReadTreefromFile(Node **tree, char *name) {
 	FILE *fp = fopen(name, "r");
+	if (!fp) {
+		return 15;
+	}
 	while (1) {
 		Node *node = (Node*) malloc(sizeof(Node));
 		int k = fscanf(fp, "%u", &(node->info));
-		scanf("%*[^\n]");
-		scanf("%*c");
+		fscanf(fp, "%*[^\n]");
+		fscanf(fp, "%*c");
 		if (!k) {
 			free(node);
 			fclose(fp);
@@ -347,6 +347,9 @@ int ReadTreefromFile(Node **tree, char *name) {
 			return 14;
 		}
 		Info info;
+		node->left = NULL;
+		node->right = NULL;
+		node->par = NULL;
 		int errcode = TreeInsert(tree, node, &info);
 		if (errcode) {
 			if (errcode == 11) {
@@ -359,4 +362,35 @@ int ReadTreefromFile(Node **tree, char *name) {
 			}
 		}
 	}
+}
+
+int recWriteNodeforGraph(Node *node, FILE *fp) {
+	if (node->left) {
+		fprintf(fp, "\t%s -> %s;\n", node->key, node->left->key);
+		recWriteNodeforGraph(node->left, fp);
+	}
+	if (node->right) {
+		fprintf(fp, "\t%s -> %s;\n", node->key, node->right->key);
+		recWriteNodeforGraph(node->right, fp);
+	}
+	return 0;
+}
+
+int WriteTreeforGraph(Node **tree) {
+	if (!tree) {
+		return 1;
+	}
+	if (!(*tree)) {
+		return 13;
+	}
+	FILE *fp = fopen("graph.dot", "w");
+	if (!fp) {
+		return 15;
+	}
+	fprintf(fp, "digraph G {\n");
+	recWriteNodeforGraph(*tree, fp);
+	fprintf(fp, "}");
+	fclose(fp);
+	system("dot -Tpng graph.dot -o graph.png");
+	return 0;
 }

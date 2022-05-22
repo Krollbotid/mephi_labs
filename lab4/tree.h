@@ -21,7 +21,8 @@ int TreeClear(Node **tree);
 Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode);
 int PrintNode(Node *node);
 int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size);
-int PrintTree(Node *tree);
+int PrintTree(Node **tree);
 int ReadTreefromFile(Node **tree, char *name);
+int WriteTreeforGraph(Node **tree);
 
 #endif

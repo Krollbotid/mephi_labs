@@ -8,8 +8,8 @@ int DTreeDelete(Node **tree);
 char **errarray();
 int errprint(int errcode, char **arr);
 int menu(const char *options[], const int N, int *id);
-int DTreeSearch(Node *tree);
-int DTreeSpecialSearch(Node *tree);
+int DTreeSearch(Node **tree);
+int DTreeSpecialSearch(Node **tree);
 int DReadTreefromFile(Node **tree);
 
 #endif

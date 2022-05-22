@@ -63,7 +63,7 @@ int menu(const char *options[], const int N, int *id) {
 }
 
 char **errarray() {
-	char **arr = (char**) malloc((21 + 1) * sizeof(char*));
+	char **arr = (char**) malloc((22 + 1) * sizeof(char*));
 	arr[0] = "Success";
 	arr[1] = "Zero value in non-zero variable";
 	arr[2] = "Out of memory";
@@ -72,6 +72,7 @@ char **errarray() {
 	arr[12] = "Tree - tree is empty! There is nothing to delete";
 	arr[13] = "Tree is empty!";
 	arr[14] = "Tree - error during reading";
+	arr[15] = "Tree - can't open file";
 	arr[21] = "Dialog - out of errmessages array";
 	arr[22] = "Dialog - incorrect file name";
 	return arr;
@@ -136,16 +137,19 @@ int DTreeDelete(Node **tree) {
 	return errcode;
 }
 
-int DTreeSearch(Node *tree) {
+int DTreeSearch(Node **tree) {
 	if (!tree) {
 		return 1;
+	}
+	if (!(*tree)) {
+		return 13;
 	}
 	KeyType *key = readline("Write key (string):");
 	if (!key) {
 		return 3;
 	}
 	int errcode = 0, size = 0;
-	Node **arr = TreeSearch(tree, key, &size, &errcode);
+	Node **arr = TreeSearch(*tree, key, &size, &errcode);
 	free(key);
 	if (errcode) {
 		return errcode;
@@ -160,21 +164,24 @@ int DTreeSearch(Node *tree) {
 	return 0;
 }
 
-int DTreeSpecialSearch(Node *tree) {
+int DTreeSpecialSearch(Node **tree) {
 	if (!tree) {
 		return 1;
+	}
+	if (!(*tree)) {
+		return 13;
 	}
 	KeyType *key = readline("Write key (string):");
 	if (!key) {
 		return 3;
 	}
 	int errcode = 0, size = 0;
-	Node **arr = (Node*) malloc(sizeof(Node) * 2);
+	Node **arr = (Node**) malloc(sizeof(Node*) * 2);
 	if (!arr) {
 		free(key);
 		return 2;
 	}
-	errcode = TreeSpecialSearch(tree, key, arr, &size);
+	errcode = TreeSpecialSearch(*tree, key, arr, &size);
 	free(key);
 	if (errcode) {
 		return errcode;
@@ -190,13 +197,11 @@ int DTreeSpecialSearch(Node *tree) {
 
 int DReadTreefromFile(Node **tree) {
 	//char *name = "test.txt";
-	char *name = readline("Please write name of file");
+	char *name = readline("Please write name of file:");
 	if (!name) {
 		return 22;
 	}
-	Info info;
 	int errcode = ReadTreefromFile(tree, name);
-	if (errcode) {
-		return errcode;
-	}
+	free(name);
+	return errcode;
 }
