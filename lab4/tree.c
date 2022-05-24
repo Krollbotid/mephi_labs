@@ -112,38 +112,31 @@ int TreeDelete(Node **tree, KeyType *key) {
 	}
 	if (!par) {
 		*tree = subtree;
-	}
-	if (par->left == realptr) {
-		par->left = subtree;
 	} else {
-		par->right = subtree;
+		if (par->left == realptr) {
+			par->left = subtree;
+		} else {
+			par->right = subtree;
+		}
 	}
+	free(ptr->key);
 	if (realptr != ptr) {
 		ptr->key = realptr->key;
+		ptr->info = realptr->info;
 	}
-	NodeDelete(realptr);
+	free(realptr);
 	return 0;
 }
 
-Node **recTreeSearch(Node *node, Node **arr, int *size, int *errcode) {
-	if (!node) {
-		*errcode = 1;
-		return NULL;
-	}
+Node **recTreeSearch(Node *node, Node **arr, int *size) {
 	if (node->left && !(strcmp(node->left->key, node->key))) {
-		arr = recTreeSearch(node->left, arr, size, errcode);
-		if (errcode) {
-			return NULL;
-		}
+		arr = recTreeSearch(node->left, arr, size);
 	}
 	arr = (Node**) realloc(arr, (*size + 1) * sizeof(Node*));
-	arr[*size] = node->right;
+	arr[*size] = node;
 	*size = *size + 1;
-	if (node->left && !(strcmp(node->right->key, node->key))) {
-		arr = recTreeSearch(node->right, arr, size, errcode);
-		if (errcode) {
-			return NULL;
-		}
+	if (node->right && !(strcmp(node->right->key, node->key))) {
+		arr = recTreeSearch(node->right, arr, size);
 	}
 	return arr;
 }
@@ -168,7 +161,7 @@ Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode) {
 		*errcode = 4;
 		return NULL;
 	}
-	Node **arr = recTreeSearch(tree, NULL, size, errcode);
+	Node **arr = recTreeSearch(tree, NULL, size);
 	if (*errcode) {
 		free(arr);
 		arr = NULL;
@@ -177,6 +170,9 @@ Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode) {
 }
 
 int PrintNode(Node *node) {
+	if (!node) {
+		return 1;
+	}
 	printf("key:%s info:%u\n", node->key, node->info);
 	return 0;
 }
@@ -266,11 +262,13 @@ int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
 		*ans = tree;
 		return 0;
 	}
+	*size = 1;
 	if (count - ansnum > ansnum - 1) {
 		*ans = TreeMaxNode(tree);
 	} else {
 		*ans = TreeMinNode(tree);
 		if (count - ansnum == ansnum - 1) {
+			*size = *size + 1;
 			ans++;
 			*ans = TreeMaxNode(tree);
 		}
@@ -321,12 +319,12 @@ int ReadTreefromFile(Node **tree, char *name) {
 		fscanf(fp, "%*[^\n]");
 		fscanf(fp, "%*c");
 		if (!k) {
-			free(node);
+			NodeDelete(node);
 			fclose(fp);
 			return 14;
 		}
 		if (k < 0) {
-			free(node);
+			NodeDelete(node);
 			fclose(fp);
 			return 0;
 		}

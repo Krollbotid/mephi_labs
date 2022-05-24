@@ -141,9 +141,13 @@ int DTreeSearch(Node **tree) {
 		return errcode;
 	}
 	int i;
-	Node *ptr = *arr;
+	Node **ptr = arr;
 	for (i = 0; i < size; i++) {
-		PrintNode(ptr);
+		errcode = PrintNode(*ptr);
+		if (errcode) {
+			free(arr);
+			return errcode;
+		}
 		ptr++;
 	}
 	free(arr);
@@ -170,14 +174,20 @@ int DTreeSpecialSearch(Node **tree) {
 	errcode = TreeSpecialSearch(*tree, key, arr, &size);
 	free(key);
 	if (errcode) {
+		free(arr);
 		return errcode;
 	}
 	int i;
-	Node *ptr = *arr;
+	Node **ptr = arr;
 	for (i = 0; i < size; i++) {
-		PrintNode(ptr);
+		errcode = PrintNode(*ptr);
+		if (errcode) {
+			free(arr);
+			return errcode;
+		}
 		ptr++;
 	}
+	free(arr);
 	return 0;
 }
 
@@ -246,6 +256,5 @@ int DTimer(Node **tree) {
 		SearchTimer,
 		SpecialSearchTimer
 	};
-	Treefuncs[id](dotnumber, amount, multiplier);
-	return 0;
+	return Treefuncs[id](dotnumber, amount, multiplier);
 }
