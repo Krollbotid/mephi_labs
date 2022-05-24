@@ -1,36 +1,6 @@
 #include "dtree.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-char *readline(char *s) {
-	printf("%s", s);
-	char buf[80 + 1] = {0}; //#define bufsiz 80
-	char *ans = NULL;
-	int len = 0, n = 0;
-	do {
-		n = scanf("%80[^\n]",buf);
-		if (n < 0){
-			if(!ans){
-				return NULL;
-			}
-		} else if (n > 0) {
-			int buf_len = strlen(buf);
-			int str_len = len + buf_len;
-			ans = (char*) realloc(ans, (str_len + 1) * sizeof(char));
-			strncpy(ans+len, buf, buf_len);
-			len = str_len;
-		} else {
-			scanf("%*c");
-		}
-	} while (n > 0);
-	if (len > 0){
-		ans[len] = '\0';
-	} else {
-		ans = (char*) calloc(1, sizeof(char));
-	}
-	return ans;
-}
 
 int getInt(int start, int end, int *ans) {// get int in [start, end)
 	char *errmsg = "";
@@ -45,6 +15,22 @@ int getInt(int start, int end, int *ans) {// get int in [start, end)
 		scanf("%*[^\n]");
 		scanf("%*c");
 	} while (!k || *ans >=end || *ans < start);
+	return 0;
+}
+
+int getIntUnsized(int *ans) {//get int > 0
+	char *errmsg = "";
+	int k = 0;
+	do {
+		printf(errmsg);
+		errmsg = "Incorrect input. Please try again.";
+		k = scanf("%u", ans);
+        if (k < 0) {
+            return 3;
+        }
+		scanf("%*[^\n]");
+		scanf("%*c");
+	} while (!k || (*ans < 1));
 	return 0;
 }
 
@@ -204,4 +190,62 @@ int DReadTreefromFile(Node **tree) {
 	int errcode = ReadTreefromFile(tree, name);
 	free(name);
 	return errcode;
+}
+
+int DWriteTreetoFile(Node **tree) {
+	//char *name = "test.txt";
+	char *name = readline("Please write name of file:");
+	if (!name) {
+		return 22;
+	}
+	int errcode = WriteTreetoFile(tree, name);
+	free(name);
+	return errcode;
+}
+
+int DRandGenTree(Node **tree) {
+	int minlen, maxlen, amount;
+	printf("Print min length of keys from [1; 20]:");
+	getInt(1, 21, &minlen);
+	printf("Print max length of keys from [1; 20]:");
+	getInt(1, 21, &maxlen);
+	printf("Print amount of elements:");
+	getIntUnsized(&amount);
+	randGenTree(tree, minlen, maxlen, amount);
+	return 0;
+}
+
+int DTimer(Node **tree) {
+	int dotnumber, amount, multiplier;
+	printf("Print amount of dots:");
+	getIntUnsized(&dotnumber);
+	printf("Print amount of tests:");
+	getIntUnsized(&amount);
+	printf("Print multiplier:");
+	getIntUnsized(&multiplier);
+	printf("List of functions you can measure:\n");
+	const char (*menuoptions[]) = {
+		"0.Insert.",
+		"1.Remove.",
+		"2.Go around.",
+		"3.Search.",
+		"4.Special search"
+	};
+	const int N = sizeof(menuoptions) / sizeof(menuoptions[0]);
+	int i;
+	for (i = 0; i < N; i++) {
+		puts(menuoptions[i]);
+	}
+	printf("Print id of function you want to measure:");
+	int id;
+	getInt(0, N + 1, &id);
+	int (*Treefuncs[]) (int dotnumber, int amount, int multiplier) = {
+		InsertTimer,
+		DeleteTimer,
+		GoAroundTimer,
+		SearchTimer,
+		SpecialSearchTimer
+	};
+	Treefuncs[id](dotnumber, amount, multiplier);
+	return 0;
 }

@@ -1,10 +1,10 @@
 #ifndef TREE_H
 #define TREE_H
 
+#include "useful.h"
+
 typedef char KeyType;
-
 typedef unsigned int Info;
-
 typedef struct Node {
 	KeyType *key;
 	struct Node *left,
@@ -24,5 +24,7 @@ int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size);
 int PrintTree(Node **tree);
 int ReadTreefromFile(Node **tree, char *name);
 int WriteTreeforGraph(Node **tree);
+int recReverseGo(Node *node);
+int WriteTreetoFile(Node **tree, char *name);
 
 #endif

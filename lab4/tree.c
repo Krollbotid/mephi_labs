@@ -1,35 +1,6 @@
 #include "tree.h"
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
-
-char *freadline(FILE *fp) {
-	char buf[80 + 1] = {0}; //#define bufsiz 80
-	char *ans = NULL;
-	int len = 0, n = 0;
-	do {
-		n = fscanf(fp, "%80[^\n]",buf);
-		if (n < 0){
-			if(!ans){
-				return NULL;
-			}
-		} else if (n > 0) {
-			int buf_len = strlen(buf);
-			int str_len = len + buf_len;
-			ans = (char*) realloc(ans, (str_len + 1) * sizeof(char));
-			strncpy(ans+len, buf, buf_len);
-			len = str_len;
-		} else {
-			fscanf(fp, "%*c");
-		}
-	} while (n > 0);
-	if (len > 0){
-		ans[len] = '\0';
-	} else {
-		ans = (char*) calloc(1, sizeof(char));
-	}
-	return ans;
-}
 
 Node *TreeMinNode(Node *node) {
 	if (!node) {
@@ -210,6 +181,16 @@ int PrintNode(Node *node) {
 	return 0;
 }
 
+int recReverseGo(Node *node) {
+	if (node->right) {
+		recReverseGo(node->right);
+	}
+	if (node->left) {
+		recReverseGo(node->left);
+	}
+	return 0;
+}
+
 int recReverseGoandPrint(Node *node) {
 	if (node->right) {
 		recReverseGoandPrint(node->right);
@@ -276,8 +257,11 @@ int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
 	if (!tree) {
 		return 13;
 	}
-	int count = 0, ansnum;
+	int count = 0, ansnum = -1;
 	recTreeGoandMark(tree, &count, key, &ansnum);
+	if (ansnum < 0) {
+		return 4;
+	}
 	if (count == 1) {
 		*ans = tree;
 		return 0;
@@ -327,6 +311,12 @@ int ReadTreefromFile(Node **tree, char *name) {
 	}
 	while (1) {
 		Node *node = (Node*) malloc(sizeof(Node));
+		node->key = freadline(fp);
+		if (!(node->key)) {
+			NodeDelete(node);
+			fclose(fp);
+			return 14;
+		}
 		int k = fscanf(fp, "%u", &(node->info));
 		fscanf(fp, "%*[^\n]");
 		fscanf(fp, "%*c");
@@ -339,12 +329,6 @@ int ReadTreefromFile(Node **tree, char *name) {
 			free(node);
 			fclose(fp);
 			return 0;
-		}
-		node->key = freadline(fp);
-		if (!(node->key)) {
-			NodeDelete(node);
-			fclose(fp);
-			return 14;
 		}
 		Info info;
 		node->left = NULL;
@@ -392,5 +376,26 @@ int WriteTreeforGraph(Node **tree) {
 	fprintf(fp, "}");
 	fclose(fp);
 	system("dot -Tpng graph.dot -o graph.png");
+	return 0;
+}
+
+int recWritetoFile(Node *node, FILE *fp) {
+	if (node->left) {
+		recWritetoFile(node->left, fp);
+	}
+	fprintf(fp, "%u\n%s\n", node->info, node->key);
+	if (node->right) {
+		recWritetoFile(node->right, fp);
+	}
+	return 0;
+}
+
+int WriteTreetoFile(Node **tree, char *name) {
+	FILE *fp = fopen(name, "w");
+	if (!fp) {
+		return 15;
+	}
+	recWritetoFile(*tree, fp);
+	fclose(fp);
 	return 0;
 }

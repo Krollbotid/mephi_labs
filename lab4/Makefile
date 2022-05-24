@@ -4,7 +4,7 @@ CFLAGS = -c -g -Wall
 
 LDFLAGS =
 
-SRCS = main.c tree.c dtree.c
+SRCS = main.c tree.c dtree.c timing.c useful.c
 
 OBJS = $(SRCS:.c=.o)
 
