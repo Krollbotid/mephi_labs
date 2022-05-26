@@ -313,20 +313,15 @@ int ReadTreefromFile(Node **tree, char *name) {
 		if (!(node->key)) {
 			NodeDelete(node);
 			fclose(fp);
-			return 14;
+			return 0;
 		}
 		int k = fscanf(fp, "%u", &(node->info));
 		fscanf(fp, "%*[^\n]");
 		fscanf(fp, "%*c");
-		if (!k) {
+		if (k < 1) {
 			NodeDelete(node);
 			fclose(fp);
 			return 14;
-		}
-		if (k < 0) {
-			NodeDelete(node);
-			fclose(fp);
-			return 0;
 		}
 		Info info;
 		node->left = NULL;

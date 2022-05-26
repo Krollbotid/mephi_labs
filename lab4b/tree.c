@@ -1,35 +1,7 @@
 #include "tree.h"
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
-
-char *freadline(FILE *fp) {
-	char buf[80 + 1] = {0}; //#define bufsiz 80
-	char *ans = NULL;
-	int len = 0, n = 0;
-	do {
-		n = fscanf(fp, "%80[^\n]",buf);
-		if (n < 0){
-			if(!ans){
-				return NULL;
-			}
-		} else if (n > 0) {
-			int buf_len = strlen(buf);
-			int str_len = len + buf_len;
-			ans = (char*) realloc(ans, (str_len + 1) * sizeof(char));
-			strncpy(ans+len, buf, buf_len);
-			len = str_len;
-		} else {
-			fscanf(fp, "%*c");
-		}
-	} while (n > 0);
-	if (len > 0){
-		ans[len] = '\0';
-	} else {
-		ans = (char*) calloc(1, sizeof(char));
-	}
-	return ans;
-}
+#include <time.h>
 
 Node *TreeMinNode(Node *node) {
 	if (!node) {
@@ -63,13 +35,55 @@ Node *TreeNextNode(Node *node) {
 	return ptr;
 }
 
+int LeftRotate(Node **tree, Node *node) {
+	Node *right = node->right, *par = node->par;
+	node->right = right->left;
+	if (right->left) {
+		right->left->par = node;
+	}
+	right->par = par;
+	if (!par) {
+		*tree = right;
+	} else {
+		if (par->left == node) {
+			par->left = right;
+		} else {
+			par->right = right;
+		}
+	}
+	right->left = node;
+	node->par = right;
+	return 0;
+}
+
+int RightRotate(Node **tree, Node *node) {
+	Node *left = node->left, *par = node->par;
+	node->left = left->right;
+	if (left->right) {
+		left->right->par = node;
+	}
+	left->par = par;
+	if (!par) {
+		*tree = left;
+	} else {
+		if (par->right == node) {
+			par->right = left;
+		} else {
+			par->left = left;
+		}
+	}
+	left->right = node;
+	node->par = left;
+	return 0;
+}
+
 int NodeDelete(Node *node) {
 	free(node->key);
 	free(node);
 	return 0;
 }
 
-int TreeInsert(Node **tree, Node *node, Info *info) {
+int TreeInsert(Node **tree, Node *node) {
 	if (!tree) {
 		return 1;
 	}
@@ -80,25 +94,75 @@ int TreeInsert(Node **tree, Node *node, Info *info) {
 	Node *ptr = *tree, *par = NULL;
 	while (ptr) {
 		par = ptr;
-		int k = strcmp(node->key, ptr->key);
-		if (!k) {
-			*info = ptr->info;
-			ptr->info = node->info;
-			return 11;  // tree - can't elements with the same keys;
-		}
-		if (k > 0) {
-			ptr = ptr->right;
+		if (strcmp(node->key, ptr->key) < 0) {
+			ptr = ptr->left;
 		} else {
 			ptr = ptr->left;
 		}
 	}
-	if (strcmp(node->key, par->key) > 0) {
-		par->right = node;
-	} else {
+	if (strcmp(node->key, par->key) < 0) {
 		par->left = node;
+	} else {
+		par->right = node;
 	}
 	node->par = par;
 	return 0;
+}
+
+int RB_Insert_Fixup(Node **tree, Node *node) {
+	Node *par, *gpar, *uncle;
+	while (node->par && node->par->color) {
+		par = node->par;
+		gpar = par->par;
+		if (par == gpar->left) {
+			uncle = gpar->right;
+			if (uncle && uncle->color) {
+				par->color = 0;
+				uncle->color = 0;
+				gpar->color = 1;
+				node = gpar;
+				continue;
+			} else if (node == par->right) {
+				node = par;
+				LeftRotate(tree, node);
+				par = node->par;
+			}
+			par->color = 0;
+			gpar->color = 1;
+			RightRotate(tree, gpar);
+		} else {
+			uncle = gpar->left;
+			if (uncle && uncle->color) {
+				par->color = 0;
+				uncle->color = 0;
+				gpar->color = 1;
+				node = gpar;
+				continue;
+			} else if (node == par->left) {
+				node = par;
+				RightRotate(tree, node);
+				par = node->par;
+			}
+			par->color = 0;
+			gpar->color = 1;
+			LeftRotate(tree, gpar);
+		}
+	}
+	if (!(node->par)) {
+		node->color = 0;
+	}
+	return 0;
+}
+
+int RB_Insert(Node **tree, Node *node) {
+	TreeInsert(tree, node);
+	node->color = 1;
+	RB_Insert_Fixup(tree, node);
+	return 0;
+}
+
+int RB_Delete_Fixup(Node **tree, Node *node) {
+
 }
 
 int TreeDelete(Node **tree, KeyType *key) {
@@ -141,38 +205,34 @@ int TreeDelete(Node **tree, KeyType *key) {
 	}
 	if (!par) {
 		*tree = subtree;
-	}
-	if (par->left == realptr) {
-		par->left = subtree;
 	} else {
-		par->right = subtree;
+		if (par->left == realptr) {
+			par->left = subtree;
+		} else {
+			par->right = subtree;
+		}
 	}
+	free(ptr->key);
 	if (realptr != ptr) {
 		ptr->key = realptr->key;
+		ptr->info = realptr->info;
 	}
-	NodeDelete(realptr);
+	if (!(realptr->color)) {
+		RB_Delete_Fixup(tree, subtree);
+	}
+	free(realptr);
 	return 0;
 }
 
-Node **recTreeSearch(Node *node, Node **arr, int *size, int *errcode) {
-	if (!node) {
-		*errcode = 1;
-		return NULL;
-	}
+Node **recTreeSearch(Node *node, Node **arr, int *size) {
 	if (node->left && !(strcmp(node->left->key, node->key))) {
-		arr = recTreeSearch(node->left, arr, size, errcode);
-		if (errcode) {
-			return NULL;
-		}
+		arr = recTreeSearch(node->left, arr, size);
 	}
 	arr = (Node**) realloc(arr, (*size + 1) * sizeof(Node*));
-	arr[*size] = node->right;
+	arr[*size] = node;
 	*size = *size + 1;
-	if (node->left && !(strcmp(node->right->key, node->key))) {
-		arr = recTreeSearch(node->right, arr, size, errcode);
-		if (errcode) {
-			return NULL;
-		}
+	if (node->right && !(strcmp(node->right->key, node->key))) {
+		arr = recTreeSearch(node->right, arr, size);
 	}
 	return arr;
 }
@@ -197,7 +257,7 @@ Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode) {
 		*errcode = 4;
 		return NULL;
 	}
-	Node **arr = recTreeSearch(tree, NULL, size, errcode);
+	Node **arr = recTreeSearch(tree, NULL, size);
 	if (*errcode) {
 		free(arr);
 		arr = NULL;
@@ -206,7 +266,20 @@ Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode) {
 }
 
 int PrintNode(Node *node) {
+	if (!node) {
+		return 1;
+	}
 	printf("key:%s info:%u\n", node->key, node->info);
+	return 0;
+}
+
+int recReverseGo(Node *node) {
+	if (node->right) {
+		recReverseGo(node->right);
+	}
+	if (node->left) {
+		recReverseGo(node->left);
+	}
 	return 0;
 }
 
@@ -276,17 +349,22 @@ int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
 	if (!tree) {
 		return 13;
 	}
-	int count = 0, ansnum;
+	int count = 0, ansnum = -1;
 	recTreeGoandMark(tree, &count, key, &ansnum);
+	if (ansnum < 0) {
+		return 4;
+	}
 	if (count == 1) {
 		*ans = tree;
 		return 0;
 	}
+	*size = 1;
 	if (count - ansnum > ansnum - 1) {
 		*ans = TreeMaxNode(tree);
 	} else {
 		*ans = TreeMinNode(tree);
 		if (count - ansnum == ansnum - 1) {
+			*size = *size + 1;
 			ans++;
 			*ans = TreeMaxNode(tree);
 		}
@@ -322,23 +400,19 @@ int PrintTree(Node **tree) {
 
 int ReadTreefromFile(Node **tree, char *name) {
 	FILE *fp = fopen(name, "r");
+	if (!fp) {
+		return 15;
+	}
 	while (1) {
 		Node *node = (Node*) malloc(sizeof(Node));
-		int k = fscanf(fp, "%u", &(node->info));
-		fscanf(fp, "%*[^\n]");
-		fscanf(fp, "%*c");
-		if (!k) {
-			free(node);
-			fclose(fp);
-			return 14;
-		}
-		if (k < 0) {
-			free(node);
+		node->key = freadline(fp);
+		if (!(node->key)) {
+			NodeDelete(node);
 			fclose(fp);
 			return 0;
 		}
-		node->key = freadline(fp);
-		if (!(node->key)) {
+		node->info = freadline(fp);
+		if (!(node->info)) {
 			NodeDelete(node);
 			fclose(fp);
 			return 14;
@@ -347,7 +421,7 @@ int ReadTreefromFile(Node **tree, char *name) {
 		node->left = NULL;
 		node->right = NULL;
 		node->par = NULL;
-		int errcode = TreeInsert(tree, node, &info);
+		int errcode = TreeInsert(tree, node);
 		if (errcode) {
 			if (errcode == 11) {
 				printf("Info in node with key:%s has been replaced. Old info:%u\n", node->key, info);
@@ -359,4 +433,56 @@ int ReadTreefromFile(Node **tree, char *name) {
 			}
 		}
 	}
+}
+
+int recWriteNodeforGraph(Node *node, FILE *fp) {
+	if (node->left) {
+		fprintf(fp, "\t%s -> %s;\n", node->key, node->left->key);
+		recWriteNodeforGraph(node->left, fp);
+	}
+	if (node->right) {
+		fprintf(fp, "\t%s -> %s;\n", node->key, node->right->key);
+		recWriteNodeforGraph(node->right, fp);
+	}
+	return 0;
+}
+
+int WriteTreeforGraph(Node **tree) {
+	if (!tree) {
+		return 1;
+	}
+	if (!(*tree)) {
+		return 13;
+	}
+	FILE *fp = fopen("graph.dot", "w");
+	if (!fp) {
+		return 15;
+	}
+	fprintf(fp, "digraph G {\n");
+	recWriteNodeforGraph(*tree, fp);
+	fprintf(fp, "}");
+	fclose(fp);
+	system("dot -Tpng graph.dot -o graph.png");
+	return 0;
+}
+
+int recWritetoFile(Node *node, FILE *fp) {
+	if (node->left) {
+		recWritetoFile(node->left, fp);
+	}
+	fprintf(fp, "%u\n%s\n", node->info, node->key);
+	if (node->right) {
+		recWritetoFile(node->right, fp);
+	}
+	return 0;
+}
+
+int WriteTreetoFile(Node **tree, char *name) {
+	FILE *fp = fopen(name, "w");
+	if (!fp) {
+		return 15;
+	}
+	recWritetoFile(*tree, fp);
+	fclose(fp);
+	return 0;
 }

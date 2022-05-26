@@ -1,20 +1,21 @@
 #ifndef TREE_H
 #define TREE_H
 
+#include "useful.h"
+
 typedef char KeyType;
-
-typedef unsigned int Info;
-
+typedef char Info;
 typedef struct Node {
 	KeyType *key;
 	struct Node *left,
 		*right,
 		*par;
-	Info info; // because it's stupid to store pointer on unsigned int instead unsigned int itself.
+	int color;  // 1 - red
+	Info *info;
 } Node;
 
 int NodeDelete(Node *node);
-int TreeInsert(Node **tree, Node *node, Info *info);
+int TreeInsert(Node **tree, Node *node);
 int TreeDelete(Node **tree, KeyType *key);
 int TreeGoAround(Node **tree);
 int TreeClear(Node **tree);
@@ -23,5 +24,8 @@ int PrintNode(Node *node);
 int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size);
 int PrintTree(Node **tree);
 int ReadTreefromFile(Node **tree, char *name);
+int WriteTreeforGraph(Node **tree);
+int recReverseGo(Node *node);
+int WriteTreetoFile(Node **tree, char *name);
 
 #endif

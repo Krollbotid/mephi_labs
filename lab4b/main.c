@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include "dtree.h"
-#include <stdio.h>
 
 int main() {
 	Node *tree = NULL;
@@ -13,7 +12,11 @@ int main() {
 		"4.Search elements in the tree by the key.",
 		"5.Search max ranged element from the element with entered key.",
 		"6.Print Tree by level.",
-		"7.Read tree from file."
+		"7.Read tree from file.",
+		"8.Write tree to file for drawing graph.",
+		"9.Timer",
+		"10.Generate random tree.",
+		"11.Write tree to file."
 	};
 	int (*Treefuncs[]) (Node **tree) = {
 		NULL,
@@ -23,7 +26,11 @@ int main() {
 		DTreeSearch,
 		DTreeSpecialSearch,
 		PrintTree,
-		DReadTreefromFile
+		DReadTreefromFile,
+		WriteTreeforGraph,
+		DTimer,
+		DRandGenTree,
+		DWriteTreetoFile
 	};
 	const int N = sizeof(menuoptions) / sizeof(menuoptions[0]);
 	int id = 1, errcode = 0;
