@@ -178,23 +178,23 @@ int PrintNode(Node *node) {
 }
 
 int recReverseGo(Node *node) {
-	if (node->right) {
-		recReverseGo(node->right);
-	}
 	if (node->left) {
 		recReverseGo(node->left);
+	}
+	if (node->right) {
+		recReverseGo(node->right);
 	}
 	return 0;
 }
 
 int recReverseGoandPrint(Node *node) {
+	if (node->left) {
+		recReverseGoandPrint(node->left);
+	}
 	if (node->right) {
 		recReverseGoandPrint(node->right);
 	}
 	PrintNode(node);
-	if (node->left) {
-		recReverseGoandPrint(node->left);
-	}
 	return 0;
 }
 
@@ -310,7 +310,7 @@ int ReadTreefromFile(Node **tree, char *name) {
 	while (1) {
 		Node *node = (Node*) malloc(sizeof(Node));
 		node->key = freadline(fp);
-		if (!(node->key)) {
+		if (!(node->key) || !(*(node->key))) {
 			NodeDelete(node);
 			fclose(fp);
 			return 0;
@@ -376,7 +376,7 @@ int recWritetoFile(Node *node, FILE *fp) {
 	if (node->left) {
 		recWritetoFile(node->left, fp);
 	}
-	fprintf(fp, "%u\n%s\n", node->info, node->key);
+	fprintf(fp, "%s\n%u\n", node->key, node->info);
 	if (node->right) {
 		recWritetoFile(node->right, fp);
 	}

@@ -233,28 +233,6 @@ int DTimer(Node **tree) {
 	getIntUnsized(&amount);
 	printf("Print multiplier:");
 	getIntUnsized(&multiplier);
-	printf("List of functions you can measure:\n");
-	const char (*menuoptions[]) = {
-		"0.Insert.",
-		"1.Remove.",
-		"2.Go around.",
-		"3.Search.",
-		"4.Special search"
-	};
-	const int N = sizeof(menuoptions) / sizeof(menuoptions[0]);
-	int i;
-	for (i = 0; i < N; i++) {
-		puts(menuoptions[i]);
-	}
-	printf("Print id of function you want to measure:");
-	int id;
-	getInt(0, N + 1, &id);
-	int (*Treefuncs[]) (int dotnumber, int amount, int multiplier) = {
-		InsertTimer,
-		DeleteTimer,
-		GoAroundTimer,
-		SearchTimer,
-		SpecialSearchTimer
-	};
-	return Treefuncs[id](dotnumber, amount, multiplier);
+	printf("Measures of search:\n");
+	return SearchTimer(dotnumber, amount, multiplier);
 }

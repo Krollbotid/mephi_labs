@@ -22,7 +22,7 @@ int main() {
 		NULL,
 		DTreeInsert,
 		DTreeDelete,
-		TreeGoAround,
+		DTreeGoAround,
 		DTreeSearch,
 		DTreeSpecialSearch,
 		PrintTree,

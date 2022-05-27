@@ -8,7 +8,7 @@ SRCS = main.c tree.c dtree.c timing.c useful.c
 
 OBJS = $(SRCS:.c=.o)
 
-EXE = lab4
+EXE = lab4b
 
 all: $(SRCS) $(EXE)
 	

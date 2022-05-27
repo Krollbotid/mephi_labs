@@ -79,6 +79,7 @@ int RightRotate(Node **tree, Node *node) {
 
 int NodeDelete(Node *node) {
 	free(node->key);
+	free(node->info);
 	free(node);
 	return 0;
 }
@@ -97,7 +98,7 @@ int TreeInsert(Node **tree, Node *node) {
 		if (strcmp(node->key, ptr->key) < 0) {
 			ptr = ptr->left;
 		} else {
-			ptr = ptr->left;
+			ptr = ptr->right;
 		}
 	}
 	if (strcmp(node->key, par->key) < 0) {
@@ -111,31 +112,31 @@ int TreeInsert(Node **tree, Node *node) {
 
 int RB_Insert_Fixup(Node **tree, Node *node) {
 	Node *par, *gpar, *uncle;
-	while (node->par && node->par->color) {
+	while (node->par && node->par->color == RED) {
 		par = node->par;
 		gpar = par->par;
 		if (par == gpar->left) {
 			uncle = gpar->right;
-			if (uncle && uncle->color) {
-				par->color = 0;
-				uncle->color = 0;
-				gpar->color = 1;
+			if (uncle && uncle->color == RED) {  //  case 1
+				par->color = BLACK;
+				uncle->color = BLACK;
+				gpar->color = RED;
 				node = gpar;
 				continue;
-			} else if (node == par->right) {
+			} else if (node == par->right) {  //  case 2
 				node = par;
 				LeftRotate(tree, node);
 				par = node->par;
 			}
-			par->color = 0;
-			gpar->color = 1;
+			par->color = BLACK;  //  case 3
+			gpar->color = RED;
 			RightRotate(tree, gpar);
 		} else {
 			uncle = gpar->left;
-			if (uncle && uncle->color) {
-				par->color = 0;
-				uncle->color = 0;
-				gpar->color = 1;
+			if (uncle && uncle->color == RED) {
+				par->color = BLACK;
+				uncle->color = BLACK;
+				gpar->color = RED;
 				node = gpar;
 				continue;
 			} else if (node == par->left) {
@@ -143,26 +144,26 @@ int RB_Insert_Fixup(Node **tree, Node *node) {
 				RightRotate(tree, node);
 				par = node->par;
 			}
-			par->color = 0;
-			gpar->color = 1;
+			par->color = BLACK;
+			gpar->color = RED;
 			LeftRotate(tree, gpar);
 		}
 	}
 	if (!(node->par)) {
-		node->color = 0;
+		node->color = BLACK;
 	}
 	return 0;
 }
 
 int RB_Insert(Node **tree, Node *node) {
 	TreeInsert(tree, node);
-	node->color = 1;
+	node->color = RED;
 	RB_Insert_Fixup(tree, node);
 	return 0;
 }
 
 int RB_Delete_Fixup(Node **tree, Node *node) {
-
+	return 0;
 }
 
 int TreeDelete(Node **tree, KeyType *key) {
@@ -213,11 +214,12 @@ int TreeDelete(Node **tree, KeyType *key) {
 		}
 	}
 	free(ptr->key);
+	free(ptr->info);
 	if (realptr != ptr) {
 		ptr->key = realptr->key;
 		ptr->info = realptr->info;
 	}
-	if (!(realptr->color)) {
+	if (realptr->color == BLACK) {
 		RB_Delete_Fixup(tree, subtree);
 	}
 	free(realptr);
@@ -269,32 +271,42 @@ int PrintNode(Node *node) {
 	if (!node) {
 		return 1;
 	}
-	printf("key:%s info:%u\n", node->key, node->info);
+	char *arr[] = {
+		"RED",
+		"BLACK"
+	};
+	printf("Color:%s key:%s info:%s\n", arr[node->color], node->key, node->info);
 	return 0;
 }
-
-int recReverseGo(Node *node) {
-	if (node->right) {
-		recReverseGo(node->right);
-	}
-	if (node->left) {
-		recReverseGo(node->left);
-	}
-	return 0;
-}
-
-int recReverseGoandPrint(Node *node) {
-	if (node->right) {
-		recReverseGoandPrint(node->right);
-	}
+int recGoandPrint(Node *node) {
 	PrintNode(node);
 	if (node->left) {
-		recReverseGoandPrint(node->left);
+		recGoandPrint(node->left);
+	}
+	if (node->right) {
+		recGoandPrint(node->right);
 	}
 	return 0;
 }
+int recGoandPrintbyKey(Node *node, KeyType *key) {
+	int k = strcmp(key, node->key), number = 0;
+	if (k <= 0) {
+		if (node->right) {
+			number += recGoandPrintbyKey(node->right, key);
+		}
+	} else {
+		PrintNode(node);
+		if (node->left) {
+			number += recGoandPrintbyKey(node->left, key);
+		}
+		if (node->right) {
+			number += recGoandPrintbyKey(node->right, key);
+		}
+	}
+	return number;
+}
 
-int TreeGoAround(Node **tree) {
+int TreeGoAround(Node **tree, KeyType *key) {
 	if (!tree) {
 		return 1;
 	}
@@ -302,7 +314,12 @@ int TreeGoAround(Node **tree) {
 		return 13; // tree is empty!
 	}
 	printf("Printing tree:\n");
-	recReverseGoandPrint(*tree);
+	if (!key) {
+		recGoandPrint(*tree);
+	} else {
+		recGoandPrintbyKey(*tree, key);
+	}
+	
 	return 0;
 }
 
@@ -343,7 +360,7 @@ int recTreeGoandMark (Node *node, int *count, KeyType *key, int *ans) {
 }
 
 int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
-	if (!key || !ans) {
+	/*if (!key || !ans) {
 		return 1;
 	}
 	if (!tree) {
@@ -368,7 +385,7 @@ int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
 			ans++;
 			*ans = TreeMaxNode(tree);
 		}
-	}
+	}*/
 	return 0;
 }
 
@@ -379,6 +396,11 @@ int recPrintbyLevel(Node *node, int depth) {
 	int i;
 	for (i = 0; i < depth; i++) {
 		printf("   ");
+	}
+	if (node->color == RED) {
+		printf("RED ");
+	} else {
+		printf("BLACK ");
 	}
 	printf("%s\n", node->key);
 	if (node->right) {
@@ -405,37 +427,35 @@ int ReadTreefromFile(Node **tree, char *name) {
 	}
 	while (1) {
 		Node *node = (Node*) malloc(sizeof(Node));
+		node->info = NULL;
 		node->key = freadline(fp);
-		if (!(node->key)) {
+		if (!(node->key) || !(*(node->key))) {
 			NodeDelete(node);
 			fclose(fp);
 			return 0;
 		}
 		node->info = freadline(fp);
-		if (!(node->info)) {
+		if (!(node->info) || !(*(node->info))) {
 			NodeDelete(node);
 			fclose(fp);
 			return 14;
 		}
-		Info info;
 		node->left = NULL;
 		node->right = NULL;
 		node->par = NULL;
-		int errcode = TreeInsert(tree, node);
+		int errcode = RB_Insert(tree, node);
 		if (errcode) {
-			if (errcode == 11) {
-				printf("Info in node with key:%s has been replaced. Old info:%u\n", node->key, info);
-				errcode = 0;
-			}
-			NodeDelete(node);
-			if (errcode) {
-				return errcode;
-			}
+			return errcode;
 		}
 	}
 }
 
 int recWriteNodeforGraph(Node *node, FILE *fp) {
+	if (node->color == RED) {
+		fprintf(fp, "\t%s [color=red];\n", node->key);
+	} else {
+		fprintf(fp, "\t%s [color=black];\n", node->key);
+	}
 	if (node->left) {
 		fprintf(fp, "\t%s -> %s;\n", node->key, node->left->key);
 		recWriteNodeforGraph(node->left, fp);
@@ -470,7 +490,7 @@ int recWritetoFile(Node *node, FILE *fp) {
 	if (node->left) {
 		recWritetoFile(node->left, fp);
 	}
-	fprintf(fp, "%u\n%s\n", node->info, node->key);
+	fprintf(fp, "%s\n%s\n", node->key, node->info);
 	if (node->right) {
 		recWritetoFile(node->right, fp);
 	}
