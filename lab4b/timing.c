@@ -5,7 +5,9 @@
 #define TESTNAMELEN 10
 
 char *randString(int minlength, int maxlength) {
-    const int chbegin = 32, chend = 126; // From ASCII usable chars are [chbegin; chend]
+    //const int chbegin = 32, chend = 126; // From ASCII usable chars are [chbegin; chend]
+    char allowed[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const int chbegin = 0, chend = sizeof(allowed) / sizeof(allowed[0]);
     int i, len = 0;
 	if (minlength == maxlength) {
 		len = minlength;
@@ -14,7 +16,7 @@ char *randString(int minlength, int maxlength) {
     }
 	char *str = (char*) malloc(sizeof(char) * (len + 1)), *ptr = str;
     for (i = 0; i < len; i++){
-        *ptr = scalerand(chbegin, chend + 1);
+        *ptr = allowed[scalerand(chbegin, chend + 1) - 1];
 		ptr++;
     }
     *ptr = '\0';
@@ -31,7 +33,7 @@ Node *randNode(int minlength, int maxlength) {
     return node;
 }
 
-int randGenTree(Node **tree, int minlength, int maxlength, int amount) {
+int randGenTree(Tree *tree, int minlength, int maxlength, int amount) {
     int i, errcode;
     srand(time(NULL));
     for (i = 0; i < amount; i++){
@@ -45,7 +47,7 @@ int randGenTree(Node **tree, int minlength, int maxlength, int amount) {
 }
 
 int SearchTimer(int dotnumber, int amount, int multiplier) {
-    Node *test = NULL;
+    Tree test = TreeInit();
     int i, j, k, begin, len = scalerand(0, TESTNAMELEN + 1), errcode, number = 10000;
     char **arr = (char**) malloc(sizeof(char*) * number), **ptr = arr;
     for (i = 0; i < number; i++) {
@@ -66,7 +68,7 @@ int SearchTimer(int dotnumber, int amount, int multiplier) {
         for (k = 0; k < number; k++) {
             int size;
             begin = clock();
-            Node **arr = TreeSearch(test, *ptr, &size, &errcode);
+            Node **arr = TreeSearch(&test, *ptr, &size, &errcode);
             time += ((double) (clock() - begin)) / CLOCKS_PER_SEC;
             free(arr);
             ptr++;
@@ -82,5 +84,6 @@ int SearchTimer(int dotnumber, int amount, int multiplier) {
     fclose(fp);
     free(arr);
     TreeClear(&test);
+    ClearTREE(&test);
 	return 0;
 }

@@ -73,7 +73,7 @@ int errprint(int errcode, char **arr) {
 	return 0;
 }
 
-int DTreeInsert(Node **tree) {
+int DTreeInsert(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
@@ -91,9 +91,6 @@ int DTreeInsert(Node **tree) {
 		NodeDelete(node);
 		return 23;
 	}
-	node->par = NULL;
-	node->left = NULL;
-	node->right = NULL;
 	int errcode = RB_Insert(tree, node);
 	if (errcode) {
 		return errcode;
@@ -101,7 +98,7 @@ int DTreeInsert(Node **tree) {
 	return errcode;
 }
 
-int DTreeDelete(Node **tree) {
+int DTreeDelete(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
@@ -114,7 +111,7 @@ int DTreeDelete(Node **tree) {
 	return errcode;
 }
 
-int DTreeGoAround(Node **tree) {
+int DTreeGoAround(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
@@ -127,11 +124,11 @@ int DTreeGoAround(Node **tree) {
 	return errcode;
 }
 
-int DTreeSearch(Node **tree) {
+int DTreeSearch(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
-	if (!(*tree)) {
+	if (tree->EList == tree->root) {
 		return 13;
 	}
 	KeyType *key = readline("Write key (string):");
@@ -139,7 +136,7 @@ int DTreeSearch(Node **tree) {
 		return 3;
 	}
 	int errcode = 0, size = 0;
-	Node **arr = TreeSearch(*tree, key, &size, &errcode);
+	Node **arr = TreeSearch(tree, key, &size, &errcode);
 	free(key);
 	if (errcode) {
 		return errcode;
@@ -147,6 +144,7 @@ int DTreeSearch(Node **tree) {
 	int i;
 	Node **ptr = arr;
 	for (i = 0; i < size; i++) {
+		printf("Number:%d ", i + 1);
 		errcode = PrintNode(*ptr);
 		if (errcode) {
 			free(arr);
@@ -158,11 +156,11 @@ int DTreeSearch(Node **tree) {
 	return 0;
 }
 
-int DTreeSpecialSearch(Node **tree) {
+int DTreeSpecialSearch(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
-	if (!(*tree)) {
+	if (tree->EList == tree->root) {
 		return 13;
 	}
 	KeyType *key = readline("Write key (string):");
@@ -170,12 +168,7 @@ int DTreeSpecialSearch(Node **tree) {
 		return 3;
 	}
 	int errcode = 0, size = 0;
-	Node **arr = (Node**) malloc(sizeof(Node*) * 2);
-	if (!arr) {
-		free(key);
-		return 2;
-	}
-	errcode = TreeSpecialSearch(*tree, key, arr, &size);
+	Node **arr = TreeSpecialSearch(tree, key, &size, &errcode);
 	free(key);
 	if (errcode) {
 		free(arr);
@@ -195,7 +188,7 @@ int DTreeSpecialSearch(Node **tree) {
 	return 0;
 }
 
-int DReadTreefromFile(Node **tree) {
+int DReadTreefromFile(Tree *tree) {
 	//char *name = "test.txt";
 	char *name = readline("Please write name of file:");
 	if (!name) {
@@ -206,7 +199,7 @@ int DReadTreefromFile(Node **tree) {
 	return errcode;
 }
 
-int DWriteTreetoFile(Node **tree) {
+int DWriteTreetoFile(Tree *tree) {
 	//char *name = "test.txt";
 	char *name = readline("Please write name of file:");
 	if (!name) {
@@ -217,7 +210,7 @@ int DWriteTreetoFile(Node **tree) {
 	return errcode;
 }
 
-int DRandGenTree(Node **tree) {
+int DRandGenTree(Tree *tree) {
 	int minlen, maxlen, amount;
 	printf("Print min length of keys from [1; 20]:");
 	getInt(1, 21, &minlen);
@@ -229,7 +222,7 @@ int DRandGenTree(Node **tree) {
 	return 0;
 }
 
-int DTimer(Node **tree) {
+int DTimer(Tree *tree) {
 	int dotnumber, amount, multiplier;
 	printf("Print amount of dots:");
 	getIntUnsized(&dotnumber);

@@ -3,47 +3,56 @@
 #include <stdlib.h>
 #include <time.h>
 
-Node *TreeMinNode(Node *node) {
-	if (!node) {
+Tree TreeInit() {
+	Tree tree;
+	Node *EList = (Node*) calloc(1, sizeof(Node));
+	EList->color = BLACK;
+	EList->key = "EList";
+	EList->info = NULL;
+	EList->par = NULL;
+	EList->left = NULL;
+	EList->right = NULL;
+	tree.EList = EList;
+	tree.root = EList;
+	return tree;
+}
+
+void ClearTREE(Tree *tree) {
+	free(tree->EList);
+	return;
+}
+
+Node *TreeMinNode(Node *EList, Node *node) {
+	if (!node || node == EList) {
 		return NULL;
 	}
-	while (node->left) {
+	while (node->left != EList) {
 		node = node->left;
 	}
 	return node;
 }
 
-Node *TreeMaxNode(Node *node) {
-	if (!node) {
-		return NULL;
-	}
-	while (node->right) {
-		node = node->right;
-	}
-	return node;
-}
-
-Node *TreeNextNode(Node *node) {
+Node *TreeNextNode(Node *EList, Node *node) {
 	if (node->right) {
-		return TreeMinNode(node->right);
+		return TreeMinNode(EList, node->right);
 	}
 	Node *ptr = node->par;
-	while (ptr && node == ptr->right) {
+	while (ptr != EList && node == ptr->right) {
 		node = ptr;
 		ptr = node->par;
 	}
 	return ptr;
 }
 
-int LeftRotate(Node **tree, Node *node) {
+int LeftRotate(Tree *tree, Node *node) {
 	Node *right = node->right, *par = node->par;
 	node->right = right->left;
-	if (right->left) {
+	if (right->left != tree->EList) {
 		right->left->par = node;
 	}
 	right->par = par;
-	if (!par) {
-		*tree = right;
+	if (par == tree->EList) {
+		tree->root = right;
 	} else {
 		if (par->left == node) {
 			par->left = right;
@@ -56,15 +65,15 @@ int LeftRotate(Node **tree, Node *node) {
 	return 0;
 }
 
-int RightRotate(Node **tree, Node *node) {
+int RightRotate(Tree *tree, Node *node) {
 	Node *left = node->left, *par = node->par;
 	node->left = left->right;
-	if (left->right) {
+	if (left->right != tree->EList) {
 		left->right->par = node;
 	}
 	left->par = par;
-	if (!par) {
-		*tree = left;
+	if (par == tree->EList) {
+		tree->root = left;
 	} else {
 		if (par->right == node) {
 			par->right = left;
@@ -84,16 +93,19 @@ int NodeDelete(Node *node) {
 	return 0;
 }
 
-int TreeInsert(Node **tree, Node *node) {
+int TreeInsert(Tree *tree, Node *node) {
 	if (!tree) {
 		return 1;
 	}
-	if(!(*tree)) {
-		*tree = node;
+	node->par = tree->EList;
+	node->left = tree->EList;
+	node->right = tree->EList;
+	if(tree->root == tree->EList) {
+		tree->root = node;
 		return 0;
 	}
-	Node *ptr = *tree, *par = NULL;
-	while (ptr) {
+	Node *ptr = tree->root, *par = NULL;
+	while (ptr != tree->EList) {
 		par = ptr;
 		if (strcmp(node->key, ptr->key) < 0) {
 			ptr = ptr->left;
@@ -110,14 +122,14 @@ int TreeInsert(Node **tree, Node *node) {
 	return 0;
 }
 
-int RB_Insert_Fixup(Node **tree, Node *node) {
+int RB_Insert_Fixup(Tree *tree, Node *node) {
 	Node *par, *gpar, *uncle;
-	while (node->par && node->par->color == RED) {
+	while (node != tree->EList && node->par != tree->EList && node->par->color == RED) {
 		par = node->par;
 		gpar = par->par;
 		if (par == gpar->left) {
 			uncle = gpar->right;
-			if (uncle && uncle->color == RED) {  //  case 1
+			if (uncle != tree->EList && uncle->color == RED) {  //  case 1
 				par->color = BLACK;
 				uncle->color = BLACK;
 				gpar->color = RED;
@@ -133,7 +145,7 @@ int RB_Insert_Fixup(Node **tree, Node *node) {
 			RightRotate(tree, gpar);
 		} else {
 			uncle = gpar->left;
-			if (uncle && uncle->color == RED) {
+			if (uncle != tree->EList && uncle->color == RED) {
 				par->color = BLACK;
 				uncle->color = BLACK;
 				gpar->color = RED;
@@ -149,32 +161,159 @@ int RB_Insert_Fixup(Node **tree, Node *node) {
 			LeftRotate(tree, gpar);
 		}
 	}
-	if (!(node->par)) {
-		node->color = BLACK;
-	}
+	tree->root->color = BLACK;
 	return 0;
 }
 
-int RB_Insert(Node **tree, Node *node) {
+int RB_Insert(Tree *tree, Node *node) {
 	TreeInsert(tree, node);
 	node->color = RED;
 	RB_Insert_Fixup(tree, node);
 	return 0;
 }
 
-int RB_Delete_Fixup(Node **tree, Node *node) {
+int RB_Delete_Fixup(Tree *tree, Node *node) {
+	while (node != tree->EList && node != tree->root && node->color == BLACK) {
+		Node *par = node->par; //  exists always because node != root
+		if (node == par->left) {
+			Node *sibling = par->right;
+			if (sibling != tree->EList && sibling->color == RED) {  //  case 1
+				sibling->color = BLACK;
+				par->color = RED;
+				LeftRotate(tree, par);
+				sibling = par->right;
+			}
+			if (sibling->left->color == BLACK && sibling->right->color == BLACK) {  //  case 2
+				sibling->color = RED;
+				node = par;
+			} else {
+				if (sibling->right->color == BLACK) {  //  case 3
+					sibling->color = RED;
+					sibling->left->color = BLACK;
+					RightRotate(tree, sibling);
+					sibling = par->right;
+				}
+				sibling->color = par->color;  //  case 4
+				par->color = BLACK;
+				sibling->right->color = BLACK;
+				LeftRotate(tree, par);
+				node = tree->root;
+			}
+		}
+		else {
+			Node *sibling = par->left;
+			if (sibling != tree->EList && sibling->color == RED) {  //  case 1
+				sibling->color = BLACK;
+				par->color = RED;
+				RightRotate(tree, par);
+				sibling = par->left;
+			}
+			if (sibling->right->color == BLACK && sibling->left->color == BLACK) {  //  case 2
+				sibling->color = RED;
+				node = par;
+			} else {
+				if (sibling->left->color == BLACK) {  //  case 3
+					sibling->color = RED;
+					sibling->right->color = BLACK;
+					LeftRotate(tree, sibling);
+					sibling = par->left;
+				}
+				sibling->color = par->color;  //  case 4
+				par->color = BLACK;
+				sibling->left->color = BLACK;
+				RightRotate(tree, par);
+				node = tree->root;
+			}
+		}
+	}
+	node->color = BLACK;
 	return 0;
 }
 
-int TreeDelete(Node **tree, KeyType *key) {
+int TreeDelete(Tree *tree, KeyType *key) {
 	if (!tree) {
 		return 1;
 	}
-	if(!(*tree)) {
+	if(tree->root == tree->EList) {
 		return 12;  // tree - tree is empty! There is nothing to delete;
 	}
-	Node *ptr = *tree;
-	while (ptr) {
+	Node *x = tree->root;
+	while (x) {
+		int k  = strcmp(key, x->key);
+		if (!k) {
+			break;
+		}
+		if (k > 0) {
+			x = x->right;
+		} else {
+			x = x->left;
+		}
+	}
+	if (!x) {
+		return 4;
+	}
+	Node *y;
+	if (x->right == tree->EList || x->left == tree->EList) {
+		y = x;
+	} else {
+		y = TreeNextNode(tree->EList, x);
+	}
+	if (y->color == BLACK) {
+		RB_Delete_Fixup(tree, y);
+	}
+	PrintTree(tree);
+	Node *p;
+	if (y->left != tree->EList) {
+		p = y->left;
+	} else {
+		p = y->right;
+	}
+	if (p && p != tree->EList) {
+		p->par = y->par;
+	}
+	if (y->par == tree->EList) {
+		tree->root = p;
+	} else {
+		if (y->par->left == y) {
+			y->par->left = p;
+		} else {
+			y->par->right = p;
+		}
+	}
+	free(x->key);
+	free(x->info);
+	if (y != x) {
+		x->key = y->key;
+		x->info = y->info;
+	}
+	free(y);
+	return 0;
+}
+
+Node **recTreeSearch(Node *Elist, Node *node, Node **arr, int *size) {
+	if (node->left != Elist && !(strcmp(node->left->key, node->key))) {
+		arr = recTreeSearch(Elist , node->left, arr, size);
+	}
+	arr = (Node**) realloc(arr, (*size + 1) * sizeof(Node*));
+	arr[*size] = node;
+	*size = *size + 1;
+	if (node->right != Elist && !(strcmp(node->right->key, node->key))) {
+		arr = recTreeSearch(Elist , node->right, arr, size);
+	}
+	return arr;
+}
+
+Node **TreeSearch(Tree *tree, KeyType *key, int *size, int *errcode) {
+	if (!tree) {
+		*errcode = 1;
+		return NULL;
+	}
+	if (tree->root == tree->EList) {
+		*errcode = 13;
+		return NULL;
+	}
+	Node *ptr = tree->root;
+	while (ptr != tree->EList) {
 		int k  = strcmp(key, ptr->key);
 		if (!k) {
 			break;
@@ -185,81 +324,11 @@ int TreeDelete(Node **tree, KeyType *key) {
 			ptr = ptr->left;
 		}
 	}
-	if (!ptr) {
-		return 4;
-	}
-	Node *realptr;
-	if (!(ptr->right && ptr->left)) {
-		realptr = ptr;
-	} else {
-		realptr = TreeNextNode(ptr);
-	}
-	Node *subtree;
-	if (realptr->left) {
-		subtree = realptr->left;
-	} else {
-		subtree = realptr->right;
-	}
-	Node *par = realptr->par;
-	if (subtree) {
-		subtree->par = par;
-	}
-	if (!par) {
-		*tree = subtree;
-	} else {
-		if (par->left == realptr) {
-			par->left = subtree;
-		} else {
-			par->right = subtree;
-		}
-	}
-	free(ptr->key);
-	free(ptr->info);
-	if (realptr != ptr) {
-		ptr->key = realptr->key;
-		ptr->info = realptr->info;
-	}
-	if (realptr->color == BLACK) {
-		RB_Delete_Fixup(tree, subtree);
-	}
-	free(realptr);
-	return 0;
-}
-
-Node **recTreeSearch(Node *node, Node **arr, int *size) {
-	if (node->left && !(strcmp(node->left->key, node->key))) {
-		arr = recTreeSearch(node->left, arr, size);
-	}
-	arr = (Node**) realloc(arr, (*size + 1) * sizeof(Node*));
-	arr[*size] = node;
-	*size = *size + 1;
-	if (node->right && !(strcmp(node->right->key, node->key))) {
-		arr = recTreeSearch(node->right, arr, size);
-	}
-	return arr;
-}
-
-Node **TreeSearch(Node *tree, KeyType *key, int *size, int *errcode) {
-	if (!tree) {
-		*errcode = 13;
-		return NULL;
-	}
-	while (tree) {
-		int k  = strcmp(key, tree->key);
-		if (!k) {
-			break;
-		}
-		if (k > 0) {
-			tree = tree->right;
-		} else {
-			tree = tree->left;
-		}
-	}
-	if (!tree) {
+	if (ptr == tree->EList) {
 		*errcode = 4;
 		return NULL;
 	}
-	Node **arr = recTreeSearch(tree, NULL, size);
+	Node **arr = recTreeSearch(tree->EList, ptr, NULL, size);
 	if (*errcode) {
 		free(arr);
 		arr = NULL;
@@ -278,115 +347,114 @@ int PrintNode(Node *node) {
 	printf("Color:%s key:%s info:%s\n", arr[node->color], node->key, node->info);
 	return 0;
 }
-int recGoandPrint(Node *node) {
+int recGoandPrint(Node *EList, Node *node) {
 	PrintNode(node);
-	if (node->left) {
-		recGoandPrint(node->left);
+	if (node->left != EList) {
+		recGoandPrint(EList, node->left);
 	}
-	if (node->right) {
-		recGoandPrint(node->right);
+	if (node->right != EList) {
+		recGoandPrint(EList, node->right);
 	}
 	return 0;
 }
-int recGoandPrintbyKey(Node *node, KeyType *key) {
-	int k = strcmp(key, node->key), number = 0;
+int recGoandPrintbyKey(Node *EList, Node *node, KeyType *key) {
+	int k = strcmp(node->key, key);
 	if (k <= 0) {
-		if (node->right) {
-			number += recGoandPrintbyKey(node->right, key);
+		if (node->right != EList) {
+			recGoandPrintbyKey(EList, node->right, key);
 		}
 	} else {
 		PrintNode(node);
-		if (node->left) {
-			number += recGoandPrintbyKey(node->left, key);
+		if (node->left != EList) {
+			recGoandPrintbyKey(EList, node->left, key);
 		}
-		if (node->right) {
-			number += recGoandPrintbyKey(node->right, key);
+		if (node->right != EList) {
+			recGoandPrintbyKey(EList, node->right, key);
 		}
 	}
-	return number;
+	return 0;
 }
 
-int TreeGoAround(Node **tree, KeyType *key) {
+int TreeGoAround(Tree *tree, KeyType *key) {
 	if (!tree) {
 		return 1;
 	}
-	if (!(*tree)) {
+	if (tree->EList == tree->root) {
 		return 13; // tree is empty!
 	}
 	printf("Printing tree:\n");
-	if (!key) {
-		recGoandPrint(*tree);
+	if (!key || !(*key)) {
+		recGoandPrint(tree->EList, tree->root);
 	} else {
-		recGoandPrintbyKey(*tree, key);
+		recGoandPrintbyKey(tree->EList, tree->root, key);
 	}
 	
 	return 0;
 }
 
-int recTreeClear(Node *node) {
-	if (node->left) {
-		recTreeClear(node->left);
+int recTreeClear(Node *EList, Node *node) {
+	if (node->left != EList) {
+		recTreeClear(EList, node->left);
 	}
-	if (node->right) {
-		recTreeClear(node->right);
+	if (node->right != EList) {
+		recTreeClear(EList, node->right);
 	}
 	return NodeDelete(node);
 }
 
-int TreeClear(Node **tree) {
+int TreeClear(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
-	if (!(*tree)) {
+	if (tree->EList == tree->root) {
 		return 0;
 	}
-	recTreeClear(*tree);
-	*tree = NULL;
+	recTreeClear(tree->EList, tree->root);
+	tree->root = tree->EList;
 	return 0;
 }
 
-int recTreeGoandMark (Node *node, int *count, KeyType *key, int *ans) {
-	if (node->left) {
-		recTreeGoandMark(node->left, count, key, ans);
+Node **TreeSpecialSearch (Tree *tree, KeyType *key, int *size, int *errcode) {
+	if (!tree || !key || !size) {
+		*errcode = 1;
+		return NULL;
 	}
-	*count = *count + 1;
-	if (!(strcmp(key, node->key))) {
-		*ans = *count;
+	if (tree->root == tree->EList) {
+		*errcode = 13;
+		return NULL;
 	}
-	if (node->right) {
-		recTreeGoandMark(node->right, count, key, ans);
-	}
-	return 0;
-}
-
-int TreeSpecialSearch (Node *tree, KeyType *key, Node **ans, int *size) {
-	/*if (!key || !ans) {
-		return 1;
-	}
-	if (!tree) {
-		return 13;
-	}
-	int count = 0, ansnum = -1;
-	recTreeGoandMark(tree, &count, key, &ansnum);
-	if (ansnum < 0) {
-		return 4;
-	}
-	if (count == 1) {
-		*ans = tree;
-		return 0;
-	}
-	*size = 1;
-	if (count - ansnum > ansnum - 1) {
-		*ans = TreeMaxNode(tree);
-	} else {
-		*ans = TreeMinNode(tree);
-		if (count - ansnum == ansnum - 1) {
-			*size = *size + 1;
-			ans++;
-			*ans = TreeMaxNode(tree);
+	Node *ptr = tree->root;
+	while (ptr != tree->EList) {
+		int k  = strcmp(key, ptr->key);
+		if (!k) {
+			break;
 		}
-	}*/
-	return 0;
+		if (k > 0) {
+			ptr = ptr->right;
+		} else {
+			ptr = ptr->left;
+		}
+	}
+	if (ptr == tree->EList) {
+		*errcode = 4;
+		return NULL;
+	}
+	Node **arr = (Node**) malloc(sizeof(Node*) * 2);
+	if (ptr->left != tree->EList) {
+		*arr = ptr->left;
+		*size = *size + 1;
+	} else if (ptr->par != tree->EList && ptr == ptr->par->right){
+		*arr = ptr->par;
+		*size = *size + 1;
+	}
+	if (ptr->right != tree->EList) {
+		arr[*size] = ptr->right;
+		*size = *size + 1;
+	} else if (ptr->par != tree->EList && ptr == ptr->par->left){
+		arr[*size] = ptr->par;
+		*size = *size + 1;
+	}
+	return arr;
 }
 
 int recPrintbyLevel(Node *node, int depth) {
@@ -409,18 +477,18 @@ int recPrintbyLevel(Node *node, int depth) {
 	return 0;
 }
 
-int PrintTree(Node **tree) {
+int PrintTree(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
-	if (!(*tree)) {
+	if (tree->EList == tree->root) {
 		return 13;
 	}
-	recPrintbyLevel(*tree, 0);
+	recPrintbyLevel(tree->root, 0);
 	return 0;
 }
 
-int ReadTreefromFile(Node **tree, char *name) {
+int ReadTreefromFile(Tree *tree, char *name) {
 	FILE *fp = fopen(name, "r");
 	if (!fp) {
 		return 15;
@@ -440,9 +508,6 @@ int ReadTreefromFile(Node **tree, char *name) {
 			fclose(fp);
 			return 14;
 		}
-		node->left = NULL;
-		node->right = NULL;
-		node->par = NULL;
 		int errcode = RB_Insert(tree, node);
 		if (errcode) {
 			return errcode;
@@ -450,28 +515,31 @@ int ReadTreefromFile(Node **tree, char *name) {
 	}
 }
 
-int recWriteNodeforGraph(Node *node, FILE *fp) {
+int recWriteNodeforGraph(Node *Elist, Node *node, FILE *fp, int number) {
+	if (node == Elist) {
+		fprintf(fp, "\t%d [shape=box, label=\"%s\", style=filled, color=black, fontcolor=white];\n", number,  node->key);
+	}
 	if (node->color == RED) {
-		fprintf(fp, "\t%s [color=red];\n", node->key);
+		fprintf(fp, "\t%d [label=\"%s\", color=red];\n", number,  node->key);
 	} else {
-		fprintf(fp, "\t%s [color=black];\n", node->key);
+		fprintf(fp, "\t%d [label=\"%s\", color=black];\n", number,  node->key);
 	}
 	if (node->left) {
-		fprintf(fp, "\t%s -> %s;\n", node->key, node->left->key);
-		recWriteNodeforGraph(node->left, fp);
+		fprintf(fp, "\t%d -> %d;\n", number, 2 * number + 1);
+		recWriteNodeforGraph(Elist, node->left, fp, 2 * number + 1);
 	}
 	if (node->right) {
-		fprintf(fp, "\t%s -> %s;\n", node->key, node->right->key);
-		recWriteNodeforGraph(node->right, fp);
+		fprintf(fp, "\t%d -> %d;\n", number, 2 * number + 2);
+		recWriteNodeforGraph(Elist, node->right, fp, 2 * number + 2);
 	}
 	return 0;
 }
 
-int WriteTreeforGraph(Node **tree) {
+int WriteTreeforGraph(Tree *tree) {
 	if (!tree) {
 		return 1;
 	}
-	if (!(*tree)) {
+	if (tree->EList == tree->root) {
 		return 13;
 	}
 	FILE *fp = fopen("graph.dot", "w");
@@ -479,30 +547,30 @@ int WriteTreeforGraph(Node **tree) {
 		return 15;
 	}
 	fprintf(fp, "digraph G {\n");
-	recWriteNodeforGraph(*tree, fp);
+	recWriteNodeforGraph(tree->EList, tree->root, fp, 0);
 	fprintf(fp, "}");
 	fclose(fp);
 	system("dot -Tpng graph.dot -o graph.png");
 	return 0;
 }
 
-int recWritetoFile(Node *node, FILE *fp) {
-	if (node->left) {
-		recWritetoFile(node->left, fp);
+int recWritetoFile(Node *EList, Node *node, FILE *fp) {
+	if (node->left != EList) {
+		recWritetoFile(EList, node->left, fp);
 	}
 	fprintf(fp, "%s\n%s\n", node->key, node->info);
-	if (node->right) {
-		recWritetoFile(node->right, fp);
+	if (node->right != EList) {
+		recWritetoFile(EList, node->right, fp);
 	}
 	return 0;
 }
 
-int WriteTreetoFile(Node **tree, char *name) {
+int WriteTreetoFile(Tree *tree, char *name) {
 	FILE *fp = fopen(name, "w");
 	if (!fp) {
 		return 15;
 	}
-	recWritetoFile(*tree, fp);
+	recWritetoFile(tree->EList, tree->root, fp);
 	fclose(fp);
 	return 0;
 }
