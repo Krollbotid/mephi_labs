@@ -314,6 +314,9 @@ int RecPrintPath(Graph *graph, int start, int v, int *pred) {
 
 int Pathfinder(Graph *graph, Info *start, Info *end, int mode) {
     int nums = GetNodeNum(start, graph, mode), nume = GetNodeNum(end, graph, mode);
+	if (nums < 0 || nume < 0) {
+                return 4;
+        }
     queue Q = newqueue(1);  // colors: 0 - white, 1 - gray, 2 - black
     int *color = (int*) malloc(sizeof(int) * graph->size), *d = (int*) malloc(sizeof(int) * graph->size), *pred = (int*) malloc(sizeof(int) * graph->size), *ptrc = color, *ptrd = d, *ptrp = pred, i;
     for (i = 0; i < graph->size; i++) {
@@ -358,6 +361,9 @@ double Weight(Info *info1, Info *info2) {
 
 int SigiRoivenAkaDijkstra(Graph *graph, Info *start, Info *end, int mode) {
     int s = GetNodeNum(start, graph, mode), numend = GetNodeNum(end, graph, mode);
+	if (s < 0 || numend < 0) {
+                return 4;
+        }
     queue Q = newqueue(1);  // colors: 0 - white, 1 - gray, 2 - black
     int *pred = (int*) malloc(sizeof(int) * graph->size), *ptrp = pred, i, *S = (int*) malloc(sizeof(int) * graph->size);
     double *d = (double*) malloc(sizeof(double) * graph->size),  *ptrd = d;
@@ -392,9 +398,27 @@ int SigiRoivenAkaDijkstra(Graph *graph, Info *start, Info *end, int mode) {
     return 0;
 }
 
+/*void makepred(int *pred, int **pi, int size, int s, int numend, int start, int end) {
+	int i;
+	for (i = 0; i < size; i++) {
+        	if (i != start) {
+        		pred[i] = pi[start][i];
+        	}
+    	}
+	pred[start] = s;
+	pred[s] = -1;
+	if (numend != end) {
+		pred[numend] = end;
+	}
+	return;
+}*/
 
 int Floyd(Graph *graph, Info *start, Info *end, int mode) {
     int i, j, s = GetNodeNum(start, graph, mode), numend = GetNodeNum(end, graph, mode), **pi = (int**) malloc(sizeof(int*) * graph->size);  // pi is number of last inner node in shortest path from i to j
+	if (s < 0 || numend < 0) {
+		free(pi);
+		return 4;
+	}
     double **d = (double**) malloc(sizeof(double*) * graph->size); // d is len of shortest path from i to j
     Info *row = graph->infos, *column;
     int **matrix = graph->matrix, *mrow;
@@ -440,8 +464,41 @@ int Floyd(Graph *graph, Info *start, Info *end, int mode) {
             }
         }
     }
-    int *pred = (int*) malloc(sizeof(int) * graph->size);
-    i = numend;
+	/*double min1 = (double) INT_MAX, min2 = min1, min3 = min1, x1 = -1, x2 = -1, x3 = -1, y1 = -1, y2 = -1, y3 = -1;
+	for (i = 0; i < graph->size; i++) {
+		for (j = 0; j < graph->size; j++) {
+			double len = -1;
+			if (i != s && j != numend && d[i][j] * d[s][i] * d[j][numend] > 0) {
+				len =  d[i][j] + d[s][i] + d[j][numend];
+			}
+			if (len >= 0 && len < min1 && len < min2 && len < min3) {
+				if (min1 >= min2 && min1 >= min3) {
+					min1 = len;
+					x1 = i;
+					y1 = j;
+				} else if (min2 >= min3) {
+					min2 = len;
+					x2 = i;
+					y2 = j;
+				} else {
+					min3 = len;
+					x3 = i;
+					y3 = j;
+				}
+			}
+		}
+	}
+	int *pred1 = (int*) malloc(sizeof(int) * graph->size), *pred2 = (int*) malloc(sizeof(int) * graph->size), *pred3 = (int*) malloc(sizeof(int) * graph->size);*/
+	int *pred = (int*) malloc(sizeof(int) * graph->size);
+	/*if (min1 != INT_MAX) {
+	makepred(pred1, pi, graph->size, s, numend, x1, y1);
+	}
+	if (min2 != INT_MAX) {
+        	makepred(pred2, pi, graph->size, s, numend, x2, y2);
+	}
+	if (min3 != INT_MAX) {
+        	makepred(pred3, pi, graph->size, s, numend, x3, y3);
+	}*/
     for (i = 0; i < graph->size; i++) {
         if (i == s) {
             pred[i] = -1;
@@ -452,6 +509,18 @@ int Floyd(Graph *graph, Info *start, Info *end, int mode) {
     pred[s] = -1;
     RecPrintPath(graph, s, numend,  pred);
     printf("\nLength of path:%6.2f\n", d[s][numend]);
+	/*if (min1 >= 0) {
+    RecPrintPath(graph, s, numend,  pred1);
+    printf("\nLength of path:%6.2f\n", min1);
+    }
+        if (min2 >= 0) {
+    RecPrintPath(graph, s, numend,  pred2);
+    printf("\nLength of path:%6.2f\n", min2);
+    }
+        if (min3 >= 0) {
+    RecPrintPath(graph, s, numend,  pred3);
+    printf("\nLength of path:%6.2f\n", min3);
+    }*/
     for (i = 0; i < graph->size; i++) {
         free(d[i]);
         free(pi[i]);
@@ -463,5 +532,8 @@ int Floyd(Graph *graph, Info *start, Info *end, int mode) {
     free(prevd);
     free(previ);
     free(pred);
+	/*free(pred1);
+	free(pred2);
+	free(pred3);*/
     return 0;
 }
