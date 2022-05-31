@@ -54,6 +54,7 @@ char **errarray() {
 	arr[1] = "Zero value in non-zero variable";
 	arr[2] = "Out of memory";
 	arr[3] = "End of file";
+	arr[4] = "Not found";
 	arr[11] = "Tree - can't elements with the same keys";
 	arr[12] = "Tree - tree is empty! There is nothing to delete";
 	arr[13] = "Tree is empty!";

@@ -291,13 +291,13 @@ int TreeDelete(Tree *tree, KeyType *key) {
 }
 
 Node **recTreeSearch(Node *Elist, Node *node, Node **arr, int *size) {
-	if (node->left != Elist && !(strcmp(node->left->key, node->key))) {
+	if (node->left && node->left != Elist && !(strcmp(node->left->key, node->key))) {
 		arr = recTreeSearch(Elist , node->left, arr, size);
 	}
 	arr = (Node**) realloc(arr, (*size + 1) * sizeof(Node*));
 	arr[*size] = node;
 	*size = *size + 1;
-	if (node->right != Elist && !(strcmp(node->right->key, node->key))) {
+	if (node->right && node->right != Elist && !(strcmp(node->right->key, node->key))) {
 		arr = recTreeSearch(Elist , node->right, arr, size);
 	}
 	return arr;
@@ -388,7 +388,6 @@ int TreeGoAround(Tree *tree, KeyType *key) {
 	} else {
 		recGoandPrintbyKey(tree->EList, tree->root, key);
 	}
-	
 	return 0;
 }
 

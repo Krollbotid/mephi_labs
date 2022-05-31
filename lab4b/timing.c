@@ -29,7 +29,7 @@ Node *randNode(int minlength, int maxlength) {
 	node->right = NULL;
 	node->par = NULL;
     node->key = randString(minlength, maxlength);
-    node->info = randString(minlength, maxlength);
+    node->info = NULL;
     return node;
 }
 
@@ -58,17 +58,22 @@ int SearchTimer(int dotnumber, int amount, int multiplier) {
     for (i = 1; i <= dotnumber; i++){
         double time = 0;
         for (j = 0; j < multiplier; j++) {
-            Node *node = randNode(len, len);
+        	Node *node = randNode(len, len);
 	    	errcode = RB_Insert(&test, node);
-		    if (errcode) {
-		    	return errcode;
-		    }
+		if (errcode) {
+			return errcode;
+		}
         }
         ptr = arr;
         for (k = 0; k < number; k++) {
-            int size;
+            int size = 0;
             begin = clock();
             Node **arr = TreeSearch(&test, *ptr, &size, &errcode);
+		if(errcode != 4 && errcode != 0) {
+			TreeClear(&test);
+			ClearTREE(&test);
+			return errcode;
+		}
             time += ((double) (clock() - begin)) / CLOCKS_PER_SEC;
             free(arr);
             ptr++;
