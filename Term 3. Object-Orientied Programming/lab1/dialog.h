@@ -9,6 +9,7 @@
 namespace dialog {
     int dMatInit(sparse::Sparse *mat);
     int dInsert(sparse::Sparse *mat);
+    int dSortLine(sparse::Sparse *mat);
 }
 
 #endif //MEPHI_LABS_DIALOG_H

@@ -13,7 +13,7 @@ namespace sparse {
     } Cell;
 
     typedef struct Line {
-        int number;
+        int number, amount, sum;
         Cell *start;
         Line *next;
     } Line;
@@ -34,7 +34,10 @@ i-> (...    a_i_j   ...  )
 
     int MatInit(Sparse *mat, int n, int m);
     int Insert(Sparse *mat, int i, int j, int v);
+    Sparse *MatCopy(Sparse *mat);
     int Clear(Sparse *mat);
+    int MatPrint(Sparse *mat);
+    int SortLine(Sparse *mat, int i);
 } //namespace end
 
 #endif MEPHI_LABS_SPARSE_H
