@@ -40,4 +40,4 @@ i-> (...    a_i_j   ...  )
     int SortLine(Sparse *mat, int i);
 } //namespace end
 
-#endif MEPHI_LABS_SPARSE_H
+#endif //MEPHI_LABS_SPARSE_H

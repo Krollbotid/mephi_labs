@@ -198,7 +198,7 @@ namespace sparse {
                 }
                 lptr = lptr->next;
             }
-            if (line->sum != min && line->sum != max || min == max) {
+            if ((line->sum != min && line->sum != max) || min == max) {
                 return 0;
             }
             Cell **arr, *ptr = line->start;

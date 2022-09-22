@@ -15,20 +15,26 @@ int main() {
         return 0;
     }
     dMatInit(matrix);
-    while (1) {
+    bool success;
+    success = true;
+    while (success) {
         try {
             dInsert(matrix);
         } catch (const char *msg) {
             std::cout << msg << std::endl;
+            success = false;
         }
-        break;
     }
     Sparse *newmat;
-    try {
-        newmat = MatCopy(matrix);
-        dSortLine(newmat);
-    } catch (const char *msg) {
-        std::cout << msg << std::endl;
+    success = true;
+    while (success) {
+        try {
+            newmat = MatCopy(matrix);
+            dSortLine(newmat);
+        } catch (const char *msg) {
+            success = false;
+            std::cout << msg << std::endl;
+        }
     }
     MatPrint(matrix);
     MatPrint(newmat);
