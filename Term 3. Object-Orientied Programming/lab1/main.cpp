@@ -3,6 +3,7 @@
 //
 #include "dialog.h"
 #include <iostream>
+#include <limits>
 
 using namespace sparse;
 using namespace dialog;
@@ -14,28 +15,33 @@ int main() {
         std::cout << "Memory allocation error" << std::endl;
         return 0;
     }
-    dMatInit(matrix);
-    bool success;
-    success = true;
-    while (success) {
+    bool error = true;
+    while (error) {
         try {
+            dMatInit(matrix);
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             dInsert(matrix);
+            error = false;
         } catch (const char *msg) {
             std::cout << msg << std::endl;
-            success = false;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
     Sparse *newmat;
-    success = true;
-    while (success) {
+    error = true;
+    while (error) {
         try {
             newmat = MatCopy(matrix);
             dSortLine(newmat);
+            error = false;
         } catch (const char *msg) {
-            success = false;
             std::cout << msg << std::endl;
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-    }
+    };
     MatPrint(matrix);
     MatPrint(newmat);
     Clear(matrix);
