@@ -24,9 +24,8 @@ namespace butas {
         Point p; // center
         double m, c; // parameters of curve
     public:
-        Buta(double m = 1, double c = 1);
-        Buta(const Point &p0, double m = 1, double c = 1);
-        Buta(double x0, double y0, double m = 1, double c = 1);
+        Buta(const Point &p0, double m = 1, double c = 2);
+        Buta(double m = 1, double c = 2, double x0 = 0, double y0 = 0);
 
         Buta& setP(const Point &p0);
         Buta& setM(double M);
@@ -39,8 +38,9 @@ namespace butas {
         types getType() const;
         const char* getPrintableType() const;
         double area() const;
-        double getFirstCoefficient() const; // returns a from r^2 = a^2 * (cos(phi))^2 - b^2 * (sin(phi))^2
-        double getSecondCoefficient() const; // returns b from r^2 = a^2 * (cos(phi))^2 - b^2 * (sin(phi))^2
+        double getFirstCoefficient() const; // returns a from r^2 = a * (cos(phi))^2 - b * (sin(phi))^2
+        double getSecondCoefficient() const; // returns b from r^2 = a * (cos(phi))^2 - b * (sin(phi))^2
+        double distance(const double phi) const;
         char* getPrintableEquation() const;
     };
 }
