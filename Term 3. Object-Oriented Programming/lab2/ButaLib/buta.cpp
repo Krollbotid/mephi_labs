@@ -34,8 +34,8 @@ types Buta::getType() const {
     }
 }
 
-const char* Buta::getPrintableType() const {
-    const char* arr[] = {
+std::string Buta::getPrintableType() const {
+    std::string arr[] = {
             "Elliptic pedal curve",
             "Hyperbolic pedal curve",
             "2 circles",

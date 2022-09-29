@@ -5,6 +5,7 @@
 #ifndef LAB2_BUTA_H
 #define LAB2_BUTA_H
 #define PI 3.14159
+#include <string>
 
 namespace butas {
     enum types {
@@ -26,7 +27,6 @@ namespace butas {
     public:
         Buta(const Point &p0, double m = 1, double c = 2);
         Buta(double m = 1, double c = 2, double x0 = 0, double y0 = 0);
-
         Buta& setP(const Point &p0);
         Buta& setM(double M);
         Buta& setC(double C);
@@ -36,7 +36,7 @@ namespace butas {
         double getC() const;
 
         types getType() const;
-        const char* getPrintableType() const;
+        std::string getPrintableType() const;
         double area() const;
         double getFirstCoefficient() const; // returns a from r^2 = a * (cos(phi))^2 - b * (sin(phi))^2
         double getSecondCoefficient() const; // returns b from r^2 = a * (cos(phi))^2 - b * (sin(phi))^2

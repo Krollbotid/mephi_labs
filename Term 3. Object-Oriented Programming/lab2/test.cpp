@@ -61,7 +61,7 @@ TEST(ButaMethods, Parameters)
     ASSERT_EQ(0, a1.getSecondCoefficient());
     ASSERT_NEAR(sqrt(2), a1.distance(PI / 4), err);
     ASSERT_STREQ("r ^ 2 = 4.00 * (cos(phi)) ^ 2\n", a1.getPrintableEquation());
-    ASSERT_STREQ("2 circles", a1.getPrintableType());
+    ASSERT_EQ("2 circles", a1.getPrintableType());
     ASSERT_EQ(butas::types::Circles, a1.getType());
     butas::Buta a2(3, 20, 1, 3);
     ASSERT_NEAR(PI * 20, a2.area(), err);
@@ -69,7 +69,7 @@ TEST(ButaMethods, Parameters)
     ASSERT_EQ(-2, a2.getSecondCoefficient());
     ASSERT_NEAR(4.47214, a2.distance(PI / 4), err);
     ASSERT_STREQ("r ^ 2 = 38.00 * (cos(phi)) ^ 2 - (-2.00) * (sin(phi)) ^ 2\n", a2.getPrintableEquation());
-    ASSERT_STREQ("Elliptic pedal curve", a2.getPrintableType());
+    ASSERT_EQ("Elliptic pedal curve", a2.getPrintableType());
     ASSERT_EQ(butas::types::ellipticPedal, a2.getType());
 }
 int main()
