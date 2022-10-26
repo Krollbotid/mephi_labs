@@ -15,7 +15,7 @@ namespace polynoms {
     public:
         Polynom(const int degree = 0);
         Polynom(const double arr[], const int degree = 0);
-        Polynom& consoleInput(std::istream stream);
+        Polynom& consoleInput(std::istream& stream);
         std::ostream& Print(std::ostream&) const;
         Polynom add(Polynom b) const;
         double PolynomValue(double x) const;

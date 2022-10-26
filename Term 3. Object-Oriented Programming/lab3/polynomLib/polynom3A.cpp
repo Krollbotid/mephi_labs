@@ -3,7 +3,6 @@
 //
 
 #include "polynom.h"
-#include <exception>
 
 using namespace polynoms;
 
@@ -25,9 +24,12 @@ Polynom::Polynom(const double arr[], const int degree): degree(degree) {
     for (int i = 0; i <= degree; i++) {
         coefs[i] = arr[i];
     }
+    for (int i = degree + 1; i < maxdegree + 1; i++) {
+        coefs[i] = 0;
+    }
 }
 
-Polynom& Polynom::consoleInput(std::istream stream) {
+Polynom& Polynom::consoleInput(std::istream& stream) {
     int degree;
     stream >> degree;
     stream.clear();
@@ -38,10 +40,13 @@ Polynom& Polynom::consoleInput(std::istream stream) {
     Polynom::degree = degree;
     for (int i = 0; i <= degree; i++) {
         double a;
-        std::cin >> a;
+        stream >> a;
         if (!stream.good()) {
             throw std::invalid_argument("Incorrect coefficient");
         }
+    }
+    for (int i = degree + 1; i < maxdegree + 1; i++) {
+        coefs[i] = 0;
     }
     return *this;
 }
@@ -49,13 +54,16 @@ Polynom& Polynom::consoleInput(std::istream stream) {
 std::ostream& Polynom::Print(std::ostream& stream) const {
     for (int i = degree; i > 0; i--) {
         if (coefs[i] != 0) {
-            stream << coefs[i] << "* x ^ " << i;
+            if (coefs[i] != 1) {
+                stream << coefs[i] << " * ";
+            }
+            stream << "x ^ " << i;
             if (coefs[i - 1] != 0) {
                 stream << " + ";
             }
         }
     }
-    if (coefs[0] != 0) {
+    if (coefs[0] != 0 || !degree) {
         stream << coefs[0];
     }
     stream << std::endl;
@@ -73,7 +81,7 @@ Polynom Polynom::add(Polynom b) const {
     for (int i = 0; i <= newdegree; i++) {
         arr[i] = coefs[i] + b.coefs[i];
     }
-    return {arr, newdegree};
+    return Polynom(arr, newdegree);
 }
 
 double Polynom::PolynomValue(double x) const {
@@ -88,10 +96,14 @@ double Polynom::PolynomValue(double x) const {
 Polynom Polynom::derivative() const {
     int newdegree = degree - 1;
     double arr[maxdegree];
+    if (newdegree < 0) {
+        arr[0] = 0;
+        return Polynom(arr,0);
+    }
     for (int i = 0; i <= newdegree; i++) {
         arr[i] = coefs[i + 1] * (i + 1);
     }
-    return {arr, newdegree};
+    return Polynom(arr, newdegree);
 }
 
 Polynom& Polynom::divideByXB(double &b) {
@@ -102,11 +114,18 @@ Polynom& Polynom::divideByXB(double &b) {
         highcoef = b * highcoef + coefs[i];
     }
     b = highcoef;
+    degree = newdegree;
+    for (int i = 0; i <= degree; i++) {
+        coefs[i] = arr[i];
+    }
+    for (int i = degree + 1; i < maxdegree + 1; i++) {
+        coefs[i] = 0;
+    }
     return *this;
 }
 
 double Polynom::zeroBySegment(double begin, double end) const {
-    double step = (end - begin) / 100000000; // 10 ^ 8
+    double step = (end - begin) / 1000000; // 10 ^ 6
     double ans = begin - step;
     for (double i = begin; i < end; i += step) {
         if (this->PolynomValue(i) * this->PolynomValue(i + step) < 0) {

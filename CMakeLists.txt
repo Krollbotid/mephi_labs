@@ -13,7 +13,7 @@ add_executable(lab2 "Term 3. Object-Oriented Programming/lab2/apptest.cpp"
         "Term 3. Object-Oriented Programming/lab2/ButaLib/buta.cpp")
 
 add_executable(lab3 "Term 3. Object-Oriented Programming/lab3/polynomLib/polynom3A.cpp"
-        "Term 3. Object-Oriented Programming/lab3/app.cpp")
+        "Term 3. Object-Oriented Programming/lab3/app3A.cpp")
 
 add_subdirectory(lib)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
