@@ -2,7 +2,7 @@
 // Created by USER on 08.10.2022.
 //
 
-#include "polynom.h"
+#include "polynom3A.h"
 
 using namespace polynoms;
 
@@ -39,8 +39,7 @@ Polynom& Polynom::consoleInput(std::istream& stream) {
     }
     Polynom::degree = degree;
     for (int i = 0; i <= degree; i++) {
-        double a;
-        stream >> a;
+        stream >> coefs[i];
         if (!stream.good()) {
             throw std::invalid_argument("Incorrect coefficient");
         }

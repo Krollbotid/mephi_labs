@@ -1,9 +1,9 @@
 //
-// Created by USER on 08.10.2022.
+// Created by USER on 28.10.2022.
 //
 
-#ifndef LAB3_POLYNOM_H
-#define LAB3_POLYNOM_H
+#ifndef LAB3B_POLYNOM3B_H
+#define LAB3B_POLYNOM3B_H
 #include <iostream>
 
 namespace polynoms {
@@ -16,8 +16,9 @@ namespace polynoms {
         Polynom(const int degree = 0);
         Polynom(const double arr[], const int degree = 0);
         Polynom& consoleInput(std::istream& stream);
-        std::ostream& Print(std::ostream&) const;
-        Polynom add(Polynom b) const;
+        friend std::istream& operator >> (std::istream&, Polynom&);
+        friend std::ostream& operator << (std::ostream&, const Polynom&);
+        const Polynom operator + (const Polynom&) const;
         double PolynomValue(double x) const;
         Polynom derivative() const;
         Polynom& divideByXB(double& b);
@@ -25,4 +26,5 @@ namespace polynoms {
     };
 }
 
-#endif //LAB3_POLYNOM_H
+
+#endif //LAB3B_POLYNOM3B_H
