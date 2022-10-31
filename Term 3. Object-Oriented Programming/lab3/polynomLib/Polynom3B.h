@@ -18,13 +18,13 @@ namespace polynoms {
         Polynom& consoleInput(std::istream& stream);
         friend std::istream& operator >> (std::istream&, Polynom&);
         friend std::ostream& operator << (std::ostream&, const Polynom&);
-        const Polynom operator + (const Polynom&) const;
+        friend const Polynom operator + (const Polynom&, const Polynom&);
         double PolynomValue(double x) const;
-        Polynom derivative() const;
+        Polynom operator ~ () const;
         Polynom& divideByXB(double& b);
         double zeroBySegment(double begin, double end) const;
+        friend const bool operator == (const Polynom&, const Polynom&);
     };
 }
-
 
 #endif //LAB3B_POLYNOM3B_H

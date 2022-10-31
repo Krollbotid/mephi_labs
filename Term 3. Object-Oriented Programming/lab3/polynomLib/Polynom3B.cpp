@@ -66,15 +66,15 @@ namespace polynoms {
         return stream;
     }
 
-    const Polynom Polynom::operator +(const Polynom &b) const {
+    const Polynom operator +(const Polynom& a, const Polynom& b) {
         Polynom tmp;
-        if (degree > b.degree) {
-            tmp.degree = degree;
+        if (a.degree > b.degree) {
+            tmp.degree = a.degree;
         } else {
             tmp.degree = b.degree;
         }
         for (int i = 0; i <= tmp.degree; i++) {
-            tmp.coefs[i] = coefs[i] + b.coefs[i];
+            tmp.coefs[i] = a.coefs[i] + b.coefs[i];
         }
         return tmp;
     }
@@ -88,17 +88,18 @@ namespace polynoms {
         return ans;
     }
 
-    Polynom Polynom::derivative() const {
-        int newdegree = degree - 1;
-        double arr[maxdegree];
-        if (newdegree < 0) {
-            arr[0] = 0;
-            return Polynom(arr, 0);
+    Polynom Polynom::operator ~ () const {
+        Polynom tmp;
+        tmp.degree = degree - 1;
+        if (tmp.degree < 0) {
+            tmp.degree = 0;
+            tmp.coefs[0] = 0;
+            return tmp;
         }
-        for (int i = 0; i <= newdegree; i++) {
-            arr[i] = coefs[i + 1] * (i + 1);
+        for (int i = 0; i <= tmp.degree; i++) {
+            tmp.coefs[i] = coefs[i + 1] * (i + 1);
         }
-        return Polynom(arr, newdegree);
+        return tmp;
     }
 
     Polynom &Polynom::divideByXB(double &b) {
@@ -143,5 +144,17 @@ namespace polynoms {
             ans = end;
         }
         return ans;
+    }
+
+    const bool operator == (const Polynom& a, const Polynom& b) {
+        if (a.degree != b.degree) {
+            return false;
+        }
+        for (int i = 0; i <= a.degree; i++) {
+            if (a.coefs[i] != b.coefs[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 }
