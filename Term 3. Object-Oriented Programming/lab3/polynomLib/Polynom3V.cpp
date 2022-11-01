@@ -1,48 +1,76 @@
 //
-// Created by USER on 28.10.2022.
+// Created by USER on 31.10.2022.
 //
 
-#include "Polynom3B.h"
+#include "Polynom3V.h"
 
 namespace polynoms {
     Polynom::Polynom(const int degree) : degree(degree) {
-        if (degree > maxdegree) { throw std::invalid_argument("Too big degree!"); }
         if (degree < 0) { throw std::invalid_argument("Degree cannot be negative!"); }
+        coefs = new double[degree + 1];
         for (int i = 0; i <= degree; i++) {
             coefs[i] = 1;
-        }
-        for (int i = degree + 1; i < maxdegree + 1; i++) {
-            coefs[i] = 0;
         }
     }
 
     Polynom::Polynom(const double arr[], const int degree) : degree(degree) {
         if (arr == nullptr) { throw std::invalid_argument("Incorrect array pf coefficients"); }
-        if (degree > maxdegree) { throw std::invalid_argument("Too big degree!"); }
         if (degree < 0) { throw std::invalid_argument("Degree cannot be negative!"); }
+        coefs = new double[degree + 1];
         for (int i = 0; i <= degree; i++) {
             coefs[i] = arr[i];
         }
-        for (int i = degree + 1; i < maxdegree + 1; i++) {
-            coefs[i] = 0;
+    }
+
+    Polynom::Polynom(const Polynom& p) : degree(p.degree) {
+        coefs = new double[degree + 1];
+        for (int i = 0; i <= degree; i++) {
+            coefs[i] = p.coefs[i];
         }
+    }
+
+    Polynom::Polynom(Polynom &&p): degree(p.degree), coefs(p.coefs) {
+        p.coefs = nullptr;
+    }
+
+    Polynom::~Polynom() {
+        delete[] coefs;
+    }
+
+    Polynom& Polynom::operator = (const Polynom& p) {
+        degree = p.degree;
+        delete[] coefs;
+        coefs = new double[degree + 1];
+        for (int i = 0; i <= p.degree; i++) {
+            coefs[i] = p.coefs[i];
+        }
+        return *this;
+    }
+
+    Polynom& Polynom::operator = (Polynom&& p) {
+        int tmp = degree;
+        degree = p.degree;
+        p.degree = tmp;
+        double *ptr = coefs;
+        coefs = p.coefs;
+        p.coefs = ptr;
+        return *this;
     }
 
     std::istream& operator >>(std::istream &stream, Polynom &p) {
         stream >> p.degree;
         stream.clear();
         stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        if (p.degree < 0 || p.degree > p.maxdegree) {
+        if (p.degree < 0) {
             throw std::invalid_argument("Incorrect degree");
         }
+        delete[] p.coefs;
+        p.coefs = new double[p.degree + 1];
         for (int i = 0; i <= p.degree; i++) {
             stream >> p.coefs[i];
             if (!stream.good()) {
                 throw std::invalid_argument("Incorrect coefficient");
             }
-        }
-        for (int i = p.degree + 1; i < p.maxdegree + 1; i++) {
-            p.coefs[i] = 0;
         }
         return stream;
     }
@@ -67,14 +95,14 @@ namespace polynoms {
     }
 
     const Polynom operator +(const Polynom& a, const Polynom& b) {
-        Polynom tmp;
+        Polynom tmp, min(a), max(b);
         if (a.degree > b.degree) {
-            tmp.degree = a.degree;
-        } else {
-            tmp.degree = b.degree;
+            max = a;
+            min = b;
         }
-        for (int i = 0; i <= tmp.degree; i++) {
-            tmp.coefs[i] = a.coefs[i] + b.coefs[i];
+        tmp = max;
+        for (int i = 0; i <= min.degree; i++) {
+            tmp.coefs[i] += min.coefs[i];
         }
         return tmp;
     }
@@ -90,12 +118,12 @@ namespace polynoms {
 
     Polynom Polynom::operator ~ () const {
         Polynom tmp;
-        tmp.degree = degree - 1;
-        if (tmp.degree < 0) {
-            tmp.degree = 0;
+        if (degree < 1) {
+            tmp = Polynom(0);
             tmp.coefs[0] = 0;
             return tmp;
         }
+        tmp = Polynom(degree - 1);
         for (int i = 0; i <= tmp.degree; i++) {
             tmp.coefs[i] = coefs[i + 1] * (i + 1);
         }
@@ -104,22 +132,17 @@ namespace polynoms {
 
     Polynom &Polynom::divideByXB(double &b) {
         if (!degree) {
-            throw std::range_error("Degree of given polynom is 0!");
+            throw std::range_error("Degree of given polynom is 0");
         }
-        int newdegree = degree - 1;
-        double arr[maxdegree], highcoef = coefs[degree];
-        for (int i = newdegree; i >= 0; i--) {
+        double *arr = new double[degree], highcoef = coefs[degree];
+        for (int i = degree - 1; i >= 0; i--) {
             arr[i] = highcoef;
             highcoef = b * highcoef + coefs[i];
         }
         b = highcoef;
-        degree = newdegree;
-        for (int i = 0; i <= degree; i++) {
-            coefs[i] = arr[i];
-        }
-        for (int i = degree + 1; i < maxdegree + 1; i++) {
-            coefs[i] = 0;
-        }
+        degree = degree - 1;
+        delete[] coefs;
+        coefs = arr;
         return *this;
     }
 

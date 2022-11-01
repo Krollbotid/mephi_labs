@@ -2,8 +2,8 @@
 // Created by USER on 08.10.2022.
 //
 
-#ifndef LAB3A_POLYNOM_H
-#define LAB3A_POLYNOM_H
+#ifndef LAB3_POLYNOM3A_H
+#define LAB3_POLYNOM3A_H
 #include <iostream>
 
 namespace polynoms {
@@ -25,4 +25,4 @@ namespace polynoms {
     };
 }
 
-#endif //LAB3A_POLYNOM_H
+#endif //LAB3_POLYNOM3A_H

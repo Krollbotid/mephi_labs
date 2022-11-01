@@ -106,6 +106,9 @@ Polynom Polynom::derivative() const {
 }
 
 Polynom& Polynom::divideByXB(double &b) {
+    if (!degree) {
+        throw std::range_error("Degree of given polynom is 0");
+    }
     int newdegree = degree - 1;
     double arr[maxdegree], highcoef = coefs[degree];
     for (int i = newdegree;  i >= 0; i--) {

@@ -1,20 +1,24 @@
 //
-// Created by USER on 28.10.2022.
+// Created by USER on 31.10.2022.
 //
 
-#ifndef LAB3_POLYNOM3B_H
-#define LAB3_POLYNOM3B_H
+#ifndef LAB3_POLYNOM3V_H
+#define LAB3_POLYNOM3V_H
 #include <iostream>
 
 namespace polynoms {
     class Polynom {
     private:
-        static const int maxdegree = 20;
         int degree;
-        double coefs[maxdegree + 1];
+        double *coefs;
     public:
         Polynom(const int degree = 0);
         Polynom(const double arr[], const int degree = 0);
+        Polynom(const Polynom&);
+        Polynom(Polynom&&);
+        ~Polynom();
+        Polynom& operator =(const Polynom&);
+        Polynom& operator =(Polynom&&);
         Polynom& consoleInput(std::istream& stream);
         friend std::istream& operator >> (std::istream&, Polynom&);
         friend std::ostream& operator << (std::ostream&, const Polynom&);
@@ -27,4 +31,4 @@ namespace polynoms {
     };
 }
 
-#endif //LAB3_POLYNOM3B_H
+#endif //LAB3_POLYNOM3V_H

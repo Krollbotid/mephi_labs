@@ -16,6 +16,8 @@ add_executable(lab3A "Term 3. Object-Oriented Programming/lab3/polynomLib/polyno
         "Term 3. Object-Oriented Programming/lab3/app3A.cpp")
 add_executable(lab3B "Term 3. Object-Oriented Programming/lab3/polynomLib/Polynom3B.cpp"
         "Term 3. Object-Oriented Programming/lab3/app3B.cpp")
+add_executable(lab3V "Term 3. Object-Oriented Programming/lab3/polynomLib/Polynom3V.cpp"
+        "Term 3. Object-Oriented Programming/lab3/app3V.cpp")
 
 add_subdirectory(lib)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
