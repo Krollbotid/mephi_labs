@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.23)
 project(mephi_labs)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -21,7 +21,7 @@ add_executable(lab3V "Term 3. Object-Oriented Programming/lab3/polynomLib/Polyno
 
 add_subdirectory(lib)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-set(SOURCE_FILES "Term 3. Object-Oriented Programming/lab2/test.cpp"
-        "Term 3. Object-Oriented Programming/lab2/ButaLib/buta.cpp")
+set(SOURCE_FILES "Term 3. Object-Oriented Programming/lab3/tests.cpp"
+        "Term 3. Object-Oriented Programming/lab3/polynomLib/Polynom3V.cpp")
 add_executable(GoogleTest ${SOURCE_FILES})
 target_link_libraries(GoogleTest gtest)

@@ -3,6 +3,8 @@
 //
 
 #include "Polynom3V.h"
+#include <limits>
+#include <cstring>
 
 namespace polynoms {
     Polynom::Polynom(const int degree) : degree(degree) {
@@ -29,12 +31,54 @@ namespace polynoms {
         }
     }
 
-    Polynom::Polynom(Polynom &&p): degree(p.degree), coefs(p.coefs) {
+    Polynom::Polynom(Polynom &&p) noexcept: degree(p.degree), coefs(p.coefs) {
         p.coefs = nullptr;
     }
 
     Polynom::~Polynom() {
         delete[] coefs;
+    }
+
+    char *Polynom::getStrPol() const {
+        char num[25];
+        size_t len = 0;
+        for (int i = degree; i > 0; i--) {
+            if (coefs[i] != 0) {
+                if (coefs[i] != 1) {
+                    sprintf(num, "%.2f * ", coefs[i]);
+                    len += strlen(num);
+                }
+                sprintf(num, "x ^ %d", i);
+                len += strlen(num);
+                if (coefs[i - 1] != 0) {
+                    len += 3;
+                }
+            }
+        }
+        if (coefs[0] != 0 || !degree) {
+            sprintf(num, "%.2f", coefs[0]);
+            len += strlen(num);
+        }
+        char* ans = new char[len + 1];
+        len = 0;
+        for (int i = degree; i > 0; i--) {
+            if (coefs[i] != 0) {
+                if (coefs[i] != 1) {
+                    sprintf(ans + len, "%.2f * ", coefs[i]);
+                    len = strlen(ans);
+                }
+                sprintf(ans + len, "x ^ %d", i);
+                len = strlen(ans);
+                if (coefs[i - 1] != 0) {
+                    sprintf(ans + len, " + ");
+                    len += 3;
+                }
+            }
+        }
+        if (coefs[0] != 0 || !degree) {
+            sprintf(ans + len, "%.2f", coefs[0]);
+        }
+        return ans;
     }
 
     Polynom& Polynom::operator = (const Polynom& p) {
@@ -47,7 +91,7 @@ namespace polynoms {
         return *this;
     }
 
-    Polynom& Polynom::operator = (Polynom&& p) {
+    Polynom& Polynom::operator = (Polynom&& p) noexcept {
         int tmp = degree;
         degree = p.degree;
         p.degree = tmp;

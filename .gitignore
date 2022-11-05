@@ -57,4 +57,5 @@ dkms.conf
 cmake-build-debug/
 cmake-build-release/
 cmake-build-wsl_profile/
+cmake-build-gtest/
 /lib/

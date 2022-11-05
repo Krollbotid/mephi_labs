@@ -15,10 +15,11 @@ namespace polynoms {
         Polynom(const int degree = 0);
         Polynom(const double arr[], const int degree = 0);
         Polynom(const Polynom&);
-        Polynom(Polynom&&);
+        Polynom(Polynom&&) noexcept ;
         ~Polynom();
+        char* getStrPol() const;
         Polynom& operator =(const Polynom&);
-        Polynom& operator =(Polynom&&);
+        Polynom& operator =(Polynom&&) noexcept ;
         Polynom& consoleInput(std::istream& stream);
         friend std::istream& operator >> (std::istream&, Polynom&);
         friend std::ostream& operator << (std::ostream&, const Polynom&);
