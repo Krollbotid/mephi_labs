@@ -19,9 +19,9 @@ TEST(PolyConstructor, InitConstructors)
 {
     double arr[] = {27, 27, 9, 1};
     polynoms::Polynom a(1), b(arr), c(arr, 3);
-    ASSERT_STREQ("x ^ 1 + 1.00", a.getStrPol());
+    ASSERT_STREQ("x + 1.00", a.getStrPol());
     ASSERT_STREQ("27.00", b.getStrPol());
-    ASSERT_STREQ("x ^ 3 + 9.00 * x ^ 2 + 27.00 * x ^ 1 + 27.00", c.getStrPol());
+    ASSERT_STREQ("x ^ 3 + 9.00x ^ 2 + 27.00x + 27.00", c.getStrPol());
     ASSERT_ANY_THROW(polynoms::Polynom d(-1));
     ASSERT_ANY_THROW(polynoms::Polynom d(nullptr));
 
@@ -42,7 +42,7 @@ TEST(PolyFunctions, Funcs)
     ASSERT_STREQ(a.getStrPol(), b.getStrPol());
     ASSERT_EQ(true, a == b);
     polynoms::Polynom c = a + b;
-    ASSERT_STREQ("2.00 * x ^ 3 + 18.00 * x ^ 2 + 54.00 * x ^ 1 + 54.00", c.getStrPol());
+    ASSERT_STREQ("2.00x ^ 3 + 18.00x ^ 2 + 54.00x + 54.00", c.getStrPol());
     ASSERT_EQ(64, a.PolynomValue(1));
     double dev[] = {27, 18, 3};
     polynoms::Polynom d(dev, 2);

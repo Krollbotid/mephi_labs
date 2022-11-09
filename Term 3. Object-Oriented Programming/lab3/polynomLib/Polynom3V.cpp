@@ -5,6 +5,7 @@
 #include "Polynom3V.h"
 #include <limits>
 #include <cstring>
+#include <cmath>
 
 namespace polynoms {
     Polynom::Polynom(const int degree) : degree(degree) {
@@ -42,41 +43,65 @@ namespace polynoms {
     char *Polynom::getStrPol() const {
         char num[25];
         size_t len = 0;
-        for (int i = degree; i > 0; i--) {
-            if (coefs[i] != 0) {
-                if (coefs[i] != 1) {
-                    sprintf(num, "%.2f * ", coefs[i]);
-                    len += strlen(num);
-                }
-                sprintf(num, "x ^ %d", i);
-                len += strlen(num);
-                if (coefs[i - 1] != 0) {
+        for (int i = degree; i >= 0; i--) {
+            if (coefs[i] == 0) {
+                continue;
+            }
+            if (i != degree || coefs[i] < 0) {
+                if (coefs[i] > 0) {
                     len += 3;
+                } else {
+                    if (i == degree) {
+                        len++;
+                    } else {
+                        len += 3;
+                    }
                 }
             }
+            if (fabs(coefs[i]) != 1 || i == 0){
+                sprintf(num, "%.2f", fabs(coefs[i]));
+                len += strlen(num);
+            }
+            if (i != 0) {
+                len++;
+            }
+            if (i > 1) {
+                sprintf(num, "%d", i);
+                len += 3 + strlen(num);
+            }
         }
-        if (coefs[0] != 0 || !degree) {
-            sprintf(num, "%.2f", coefs[0]);
-            len += strlen(num);
-        }
-        char* ans = new char[len + 1];
+        char *ans = new char[len + 1];
         len = 0;
-        for (int i = degree; i > 0; i--) {
-            if (coefs[i] != 0) {
-                if (coefs[i] != 1) {
-                    sprintf(ans + len, "%.2f * ", coefs[i]);
-                    len = strlen(ans);
-                }
-                sprintf(ans + len, "x ^ %d", i);
-                len = strlen(ans);
-                if (coefs[i - 1] != 0) {
+        for (int i = degree; i >= 0; i--) {
+            if (coefs[i] == 0) {
+                continue;
+            }
+            if (i != degree || coefs[i] < 0) {
+                if (coefs[i] > 0) {
                     sprintf(ans + len, " + ");
                     len += 3;
+                } else {
+                    if (i == degree) {
+                        sprintf(ans + len, "-");
+                        len++;
+                    } else {
+                        sprintf(ans + len, " - ");
+                        len += 3;
+                    }
                 }
             }
-        }
-        if (coefs[0] != 0 || !degree) {
-            sprintf(ans + len, "%.2f", coefs[0]);
+            if (fabs(coefs[i]) != 1 || i == 0){
+                sprintf(ans + len, "%.2f", fabs(coefs[i]));
+                len = strlen(ans);
+            }
+            if (i != 0) {
+                sprintf(ans + len, "x");
+                len++;
+            }
+            if (i > 1) {
+                sprintf(ans + len, " ^ %d", i);
+                len = strlen(ans);
+            }
         }
         return ans;
     }
@@ -103,6 +128,9 @@ namespace polynoms {
 
     std::istream& operator >>(std::istream &stream, Polynom &p) {
         stream >> p.degree;
+        if (!stream.good()) {
+            throw std::invalid_argument("Incorrect degree");
+        }
         stream.clear();
         stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         if (p.degree < 0) {
@@ -119,34 +147,51 @@ namespace polynoms {
         return stream;
     }
 
-    std::ostream& operator <<(std::ostream &stream, const Polynom &p) {
-        for (int i = p.degree; i > 0; i--) {
-            if (p.coefs[i] != 0) {
-                if (p.coefs[i] != 1) {
-                    stream << p.coefs[i] << " * ";
-                }
-                stream << "x ^ " << i;
-                if (p.coefs[i - 1] != 0) {
+    std::ostream& operator <<(std::ostream& stream, const Polynom& p) {
+        for (int i = p.degree; i >= 0; i--) {
+            if (p.coefs[i] == 0) {
+                continue;
+            }
+            if (i != p.degree || p.coefs[i] < 0) {
+                if (p.coefs[i] > 0) {
                     stream << " + ";
+                } else {
+                    if (i == p.degree) {
+                        stream << "-";
+                    } else {
+                        stream << " - ";
+                    }
                 }
             }
+            if (fabs(p.coefs[i]) != 1 || i == 0){
+                stream << fabs(p.coefs[i]);
+            }
+            if (i != 0) {
+                stream << "x";
+            }
+            if (i > 1) {
+                stream << " ^ " << i;
+            }
         }
-        if (p.coefs[0] != 0 || !p.degree) {
-            stream << p.coefs[0];
-        }
-        stream << std::endl;
         return stream;
     }
 
     const Polynom operator +(const Polynom& a, const Polynom& b) {
-        Polynom tmp, min(a), max(b);
+        Polynom tmp;
+        int min;
         if (a.degree > b.degree) {
-            max = a;
-            min = b;
+            tmp = a;
+            min = b.degree;
+        } else {
+            tmp = b;
+            min = a.degree;
         }
-        tmp = max;
-        for (int i = 0; i <= min.degree; i++) {
-            tmp.coefs[i] += min.coefs[i];
+        for (int i = 0; i <= min; i++) {
+            if (a.degree > b.degree) {
+                tmp.coefs[i] += b.coefs[i];
+            } else {
+                tmp.coefs[i] += a.coefs[i];
+            }
         }
         return tmp;
     }
@@ -176,7 +221,9 @@ namespace polynoms {
 
     Polynom &Polynom::divideByXB(double &b) {
         if (!degree) {
-            throw std::range_error("Degree of given polynom is 0");
+            b = coefs[0];
+            coefs[0] = 0;
+            return *this;
         }
         double *arr = new double[degree], highcoef = coefs[degree];
         for (int i = degree - 1; i >= 0; i--) {
@@ -196,20 +243,20 @@ namespace polynoms {
         for (double i = begin; i < end; i += step) {
             if (this->PolynomValue(i) * this->PolynomValue(i + step) < 0) {
                 if (ans > begin) {
-                    throw std::length_error("More than one zero! Decrease");
+                    throw std::length_error("More than one zero! Decrease segment!");
                 }
                 ans = i + step / 2;
             }
             if (this->PolynomValue(i) == 0) {
                 if (ans > begin) {
-                    throw std::length_error("More than one zero! Decrease");
+                    throw std::length_error("More than one zero! Decrease segment!");
                 }
                 ans = i;
             }
         }
         if (this->PolynomValue(end) == 0) {
             if (ans > begin) {
-                throw std::length_error("More than one zero! Decrease");
+                throw std::length_error("More than one zero! Decrease segment!");
             }
             ans = end;
         }

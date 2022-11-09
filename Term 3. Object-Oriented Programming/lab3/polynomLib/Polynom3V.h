@@ -20,7 +20,6 @@ namespace polynoms {
         char* getStrPol() const;
         Polynom& operator =(const Polynom&);
         Polynom& operator =(Polynom&&) noexcept ;
-        Polynom& consoleInput(std::istream& stream);
         friend std::istream& operator >> (std::istream&, Polynom&);
         friend std::ostream& operator << (std::ostream&, const Polynom&);
         friend const Polynom operator + (const Polynom&, const Polynom&);
