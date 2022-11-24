@@ -29,8 +29,8 @@ namespace agencies {
         return is;
     }
     // Agency:
-    Agency::Agency(std::string prof, std::string pl, const long long lic, const agencies::types typ) :
-        profile(std::move(prof)), place(std::move(pl)), license(lic), type(typ) {}
+    Agency::Agency(const std::string &prof, const std::string &pl, const long long &lic, const agencies::types &typ) :
+        profile(prof), place(pl), license(lic), type(typ) {}
 
     types Agency::getType() const {
         return type;
@@ -61,13 +61,28 @@ namespace agencies {
         return ag.learnInfo(is);
     }
 
+    std::ostream &Agency::printInfo(std::ostream &os) const {
+        return os;
+    }
+    std::istream &Agency::learnInfo(std::istream &is) {
+        return is;
+    }
+
+    bool operator==(const Agency &a, const Agency &b) {
+        return a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile;
+    }
+
     // Printing:
-    Printing::Printing(int per, int prtr): Agency(), period(per), printrun(prtr) {}
+    Printing::Printing(const int &per, const int &prtr): Agency(), period(per), printrun(prtr) {
+        type = printing;
+    }
 
-    Printing::Printing(std::string prof, std::string pl, long long lic, agencies::types typ, int per, int prtr):
-        Agency(std::move(prof), std::move(pl), lic, typ), period(per), printrun(prtr) {}
+    Printing::Printing(const std::string& prof, const std::string& pl, const long long &lic, const int &per, const int &prtr):
+        Agency(prof, pl, lic, printing), period(per), printrun(prtr) {}
 
-    Printing::Printing(agencies::Agency &ag, int per, int prtr): Agency(std::move(ag)), period(per), printrun(prtr)  {}
+    Printing::Printing(const agencies::Agency &ag, const int &per, const int &prtr): Agency(ag), period(per), printrun(prtr)  {
+        type = printing;
+    }
 
     int Printing::getPeriod() const {
         return period;
@@ -100,13 +115,26 @@ namespace agencies {
     std::istream& Printing::learnInfo(std::istream &is) {
         return is >> profile >> license >> place >> type >> period >> printrun;
     }
+
+    bool operator==(const Printing& a, const Printing& b) {
+        return a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile
+        && a.period == b.period && a.printrun == b.printrun;
+    }
     // Telecompany:
-    Telecompany::Telecompany(double frq): Agency(), frequency(frq) {}
+    Telecompany::Telecompany(const double &frq): Agency(), frequency(frq) {
+        type = telecompany;
+    }
 
-    Telecompany::Telecompany(std::string prof, std::string pl, long long lic, agencies::types typ, double frq):
-            Agency(std::move(prof), std::move(pl), lic, typ), frequency(frq) {}
+    Telecompany::Telecompany(const std::string &prof, const std::string &pl, const long long &lic, const double &frq):
+            Agency(prof, pl, lic, telecompany), frequency(frq) {}
 
-    Telecompany::Telecompany(agencies::Agency &ag, double frq): Agency(std::move(ag)), frequency(frq)  {}
+    Telecompany::Telecompany(const agencies::Agency &ag, const double &frq): Agency(ag), frequency(frq)  {
+        type = telecompany;
+    }
+
+    double Telecompany::getFrequency() const {
+        return frequency;
+    }
 
     std::string Telecompany::getInfo() const {
         return "Profile: " + profile + " License: №" + std::to_string(license) + " Place: " + place + " Type: "
@@ -120,8 +148,14 @@ namespace agencies {
     std::istream& Telecompany::learnInfo(std::istream &is) {
         return is >> profile >> license >> place >> type >> frequency;
     }
+
+    bool operator==(const Telecompany& a, const Telecompany& b) {
+        return a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile
+               && a.frequency == b.frequency;
+    }
+
     // FrqDesc:
-    FrqDesc::FrqDesc(double frq, double from, double to): frequency(frq), translationFrom(from), translationTo(to) {}
+    FrqDesc::FrqDesc(const double &frq, const double &from, const double &to): frequency(frq), translationFrom(from), translationTo(to) {}
 
     std::ostream& operator<<(std::ostream &os, const FrqDesc &frq) {
         return os << frq.frequency << " " << frq.translationTo << " " << frq.translationFrom;
@@ -130,6 +164,15 @@ namespace agencies {
     std::istream& operator>>(std::istream &is, FrqDesc &frq) {
         return is >> frq.frequency >> frq.translationTo >> frq.translationFrom;
     }
+
+    bool operator==(const FrqDesc &a, const FrqDesc &b) {
+        return a.frequency == b.frequency && a.translationFrom == b.translationFrom && a.translationTo == b.translationTo;
+    }
+
+    bool operator!=(const FrqDesc &a, const FrqDesc &b) {
+        return !(a == b);
+    }
+
     // Radio:
     Radio::Radio(const std::vector<FrqDesc>& newpairs): Agency() {
         if (newpairs.size() > 3) {
@@ -142,10 +185,11 @@ namespace agencies {
         for (int i = newpairs.size(); i < 3; i++) {
             pairs[i] = FrqDesc();
         }
+        type = radio;
     }
 
-    Radio::Radio(std::string prof, std::string pl, long long lic, agencies::types typ, std::vector<FrqDesc> newpairs):
-        Agency(std::move(prof), std::move(pl), lic, typ) {
+    Radio::Radio(const std::string &prof, const std::string &pl, const long long &lic, const std::vector<FrqDesc> &newpairs):
+        Agency(prof, pl, lic, radio) {
             if (newpairs.size() > 3) {
                 throw std::range_error("Too many pairs put in constructor");
             }
@@ -158,7 +202,7 @@ namespace agencies {
             }
     }
 
-    Radio::Radio(Agency &ag, std::vector<FrqDesc> newpairs): Agency(std::move(ag)) {
+    Radio::Radio(const Agency &ag, const std::vector<FrqDesc> &newpairs): Agency(ag) {
         if (newpairs.size() > 3) {
             throw std::range_error("Too many pairs put in constructor");
         }
@@ -169,18 +213,23 @@ namespace agencies {
         for (int i = newpairs.size(); i < 3; i++) {
             pairs[i] = FrqDesc();
         }
+        type = radio;
     }
 
-    FrqDesc *Radio::getPairs() const {
-        try {
-            FrqDesc *ans = new FrqDesc[3];
-            for (int i = 0; i < 3; i++) {
-                ans[i] = pairs[i];
-            }
-            return ans;
-        } catch(std::bad_alloc &ex) {
-            throw std::bad_alloc(ex);
+    Radio::Radio(const Radio& r): Agency(r.profile, r.place, r.license, radio), amount(r.amount) {
+        for (int i = 0; i < 3; i++) {
+            pairs[i] = r.pairs[i];
         }
+    }
+
+    Radio::Radio(agencies::Radio &&r) : Radio(r) {}
+
+    std::vector <FrqDesc> Radio::getPairs() const {
+        std::vector <FrqDesc> ans;
+        for (int i = 0; i < 3; i++) {
+            ans.push_back(pairs[i]);
+        }
+        return ans;
     }
 
     Radio &Radio::setPairs(std::vector<FrqDesc> newPairs) {
@@ -220,5 +269,17 @@ namespace agencies {
             is >> pairs[i];
         }
         return is;
+    }
+
+    bool operator==(const Radio& a, const Radio& b) {
+        if (a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile
+               && a.amount == b.amount) {
+            for (int i = 0; i < a.amount; i++) {
+                if (a.pairs[i] != b.pairs[i]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
