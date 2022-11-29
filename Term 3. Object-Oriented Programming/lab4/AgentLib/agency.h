@@ -27,9 +27,12 @@ namespace agencies {
         types type;
         virtual std::ostream& printInfo(std::ostream&) const;
         virtual std::istream& learnInfo(std::istream&);
+        virtual bool isEqual(const Agency*) const;
     public:
-        Agency(const std::string &prof = "Profile", const std::string &pl = "Place", const long long &lic = 0,
+        Agency(std::string prof = "Profile", std::string pl = "Place", const long long &lic = 0,
                const types &typ = unnamed);
+        virtual ~Agency() {};
+        virtual Agency *clone() const;
         virtual std::string getInfo() const;
         types getType() const;
         std::string getProfile() const;
@@ -38,6 +41,7 @@ namespace agencies {
         friend std::ostream& operator <<(std::ostream&, const Agency&);
         friend std::istream& operator >>(std::istream&, Agency&);
         friend bool operator ==(const Agency&, const Agency&);
+
     };
 
     class Printing: public Agency {
@@ -45,16 +49,18 @@ namespace agencies {
         int period, printrun;
         virtual std::ostream& printInfo(std::ostream&) const;
         virtual std::istream& learnInfo(std::istream&);
+        virtual bool isEqual(const Agency*) const;
     public:
         Printing(const int &per = 1, const int &prtr = 1);
         Printing(const Agency &ag, const int &per = 1, const int &prtr = 1);
         Printing(const std::string& prof, const std::string& pl, const long long &lic, const int &per = 1, const int &prtr = 1);
+        virtual Agency *clone() const;
         int getPeriod() const;
         int getPrintrun() const;
         std::string getInfo() const;
         Printing& setPeriod(int newPeriod);
         Printing& setPrintrun(int newPrintrun);
-        friend bool operator ==(const Printing&, const Printing&);
+
     };
 
     class Telecompany: public Agency {
@@ -62,13 +68,14 @@ namespace agencies {
         double frequency;
         virtual std::ostream& printInfo(std::ostream&) const;
         virtual std::istream& learnInfo(std::istream&);
+        virtual bool isEqual(const Agency*) const;
     public:
         Telecompany(const double &frq = 1);
         Telecompany(const Agency &ag, const double &frq = 1);
         Telecompany(const std::string &prof, const std::string &pl, const long long &lic, const double &frq = 1);
+        virtual Agency *clone() const;
         double getFrequency() const;
         std::string getInfo() const;
-        friend bool operator ==(const Telecompany&, const Telecompany&);
     };
 
     struct FrqDesc {
@@ -86,17 +93,16 @@ namespace agencies {
         FrqDesc pairs[3];
         virtual std::ostream& printInfo(std::ostream&) const;
         virtual std::istream& learnInfo(std::istream&);
+        virtual bool isEqual(const Agency*) const;
     public:
         Radio(const std::vector <FrqDesc>& newpairs = {});
         Radio(const std::string &prof, const std::string &pl, const long long &lic, const std::vector <FrqDesc> &newpairs = {});
         Radio(const Agency &ag, const std::vector <FrqDesc> &newpairs = {});
-        Radio(const Radio&);
-        Radio(Radio&&);
+        virtual Agency *clone() const;
         std::vector <FrqDesc> getPairs() const; // return pointer to dynamic array with size 3. All unused slots are initialized
         // with default values;
         Radio& setPairs(std::vector <FrqDesc> newPairs);
         std::string getInfo() const;
-        friend bool operator ==(const Radio&, const Radio&);
     };
 }
 

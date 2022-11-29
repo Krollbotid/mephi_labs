@@ -94,6 +94,34 @@ TEST(AgenciesFuncs, OtherFuncs) {
                  radio1.getInfo().c_str());
 }
 
+TEST(TableAll, TableAll) {
+    table::Table table1;
+    ASSERT_STREQ("", table1.printTable().c_str());
+    Agency ag("Profile1", "Place1", 345, radio);
+    auto printing1 = new Printing(2, 3);
+    auto telecompany1 = new Telecompany(ag, 4);
+    FrqDesc frqDesc1(5, 6, 7), frqDesc2(8, 9, 10), frqDescDef;
+    std::vector <FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
+    auto radio1 = new Radio(vec);
+    ASSERT_STREQ("", table1.printTable().c_str());
+    table1.insert("PrintingName", printing1).insert("TelecompanyName", telecompany1).insert("RadioName", radio1);
+    std::string s = "Name: PrintingName " + printing1->getInfo() + "\n" + "Name: RadioName " + radio1->getInfo() + "\n"
+            + "Name: TelecompanyName " + telecompany1->getInfo() + "\n";
+    ASSERT_STREQ(s.c_str(), table1.printTable().c_str());
+    table::Table table2(table1), table3 = table2;
+    table3 = table1;
+    ASSERT_STREQ(s.c_str(), table2.printTable().c_str());
+    ASSERT_STREQ(s.c_str(), table3.printTable().c_str());
+    std::string g = "Name: TelecompanyName " + telecompany1->getInfo();
+    ASSERT_STREQ(g.c_str(), table::printPair(*(table1.find("TelecompanyName"))).c_str());
+    table3.remove("RadioName");
+    s = "Name: PrintingName " + printing1->getInfo() + "\n" + "Name: TelecompanyName " + telecompany1->getInfo() + "\n";
+    ASSERT_STREQ(s.c_str(), table3.printTable().c_str());
+    delete telecompany1;
+    delete radio1;
+    delete printing1;
+}
+
 int main()
 {
     ::testing::InitGoogleTest();

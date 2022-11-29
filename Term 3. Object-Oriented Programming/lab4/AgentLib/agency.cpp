@@ -29,8 +29,12 @@ namespace agencies {
         return is;
     }
     // Agency:
-    Agency::Agency(const std::string &prof, const std::string &pl, const long long &lic, const agencies::types &typ) :
-        profile(prof), place(pl), license(lic), type(typ) {}
+    Agency::Agency(std::string prof, std::string pl, const long long &lic, const agencies::types &typ) :
+        profile(std::move(prof)), place(std::move(pl)), license(lic), type(typ) {}
+
+    Agency *Agency::clone() const {
+        return new Agency(*this);
+    }
 
     types Agency::getType() const {
         return type;
@@ -64,12 +68,17 @@ namespace agencies {
     std::ostream &Agency::printInfo(std::ostream &os) const {
         return os;
     }
+
     std::istream &Agency::learnInfo(std::istream &is) {
         return is;
     }
 
+    bool Agency::isEqual(const agencies::Agency *b) const {
+        return license == b->license && type == b->type && place == b->place && profile == b->profile;
+    }
+
     bool operator==(const Agency &a, const Agency &b) {
-        return a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile;
+        return a.isEqual(&b);
     }
 
     // Printing:
@@ -82,6 +91,10 @@ namespace agencies {
 
     Printing::Printing(const agencies::Agency &ag, const int &per, const int &prtr): Agency(ag), period(per), printrun(prtr)  {
         type = printing;
+    }
+
+    Agency *Printing::clone() const {
+        return new Printing(*this);
     }
 
     int Printing::getPeriod() const {
@@ -116,10 +129,10 @@ namespace agencies {
         return is >> profile >> license >> place >> type >> period >> printrun;
     }
 
-    bool operator==(const Printing& a, const Printing& b) {
-        return a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile
-        && a.period == b.period && a.printrun == b.printrun;
+    bool Printing::isEqual(const agencies::Agency *b) const {
+        return Agency::isEqual(b) && ((Printing*) b)->period == period && ((Printing*) b)->printrun == printrun;
     }
+
     // Telecompany:
     Telecompany::Telecompany(const double &frq): Agency(), frequency(frq) {
         type = telecompany;
@@ -130,6 +143,10 @@ namespace agencies {
 
     Telecompany::Telecompany(const agencies::Agency &ag, const double &frq): Agency(ag), frequency(frq)  {
         type = telecompany;
+    }
+
+    Agency *Telecompany::clone() const {
+        return new Telecompany(*this);
     }
 
     double Telecompany::getFrequency() const {
@@ -149,9 +166,8 @@ namespace agencies {
         return is >> profile >> license >> place >> type >> frequency;
     }
 
-    bool operator==(const Telecompany& a, const Telecompany& b) {
-        return a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile
-               && a.frequency == b.frequency;
+    bool Telecompany::isEqual(const agencies::Agency *b) const {
+        return Agency::isEqual(b) && ((Telecompany*) b)->frequency == frequency;
     }
 
     // FrqDesc:
@@ -216,18 +232,14 @@ namespace agencies {
         type = radio;
     }
 
-    Radio::Radio(const Radio& r): Agency(r.profile, r.place, r.license, radio), amount(r.amount) {
-        for (int i = 0; i < 3; i++) {
-            pairs[i] = r.pairs[i];
-        }
+    Agency *Radio::clone() const {
+        return new Radio(*this);
     }
-
-    Radio::Radio(agencies::Radio &&r) : Radio(r) {}
 
     std::vector <FrqDesc> Radio::getPairs() const {
         std::vector <FrqDesc> ans;
-        for (int i = 0; i < 3; i++) {
-            ans.push_back(pairs[i]);
+        for (const auto & pair : pairs) {
+            ans.push_back(pair);
         }
         return ans;
     }
@@ -243,6 +255,7 @@ namespace agencies {
         for (int i = newPairs.size(); i < 3; i++) {
             pairs[i] = FrqDesc();
         }
+        return *this;
     }
 
     std::string Radio::getInfo() const {
@@ -271,15 +284,15 @@ namespace agencies {
         return is;
     }
 
-    bool operator==(const Radio& a, const Radio& b) {
-        if (a.license == b.license && a.type == b.type && a.place == b.place && a.profile == b.profile
-               && a.amount == b.amount) {
-            for (int i = 0; i < a.amount; i++) {
-                if (a.pairs[i] != b.pairs[i]) {
+    bool Radio::isEqual(const agencies::Agency *b) const {
+        if (Agency::isEqual(b) && ((Radio*) b)->amount == amount) {
+            for (int i = 0; i < amount; i++) {
+                if (pairs[i] != ((Radio*) b)->pairs[i]) {
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 }
