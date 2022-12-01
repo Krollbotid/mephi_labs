@@ -27,6 +27,7 @@ add_executable(lab4 "Term 3. Object-Oriented Programming/lab4/AgentLib/agency.cp
 add_subdirectory(lib)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 set(SOURCE_FILES "Term 3. Object-Oriented Programming/lab4/test.cpp"
-        "Term 3. Object-Oriented Programming/lab4/AgentLib/agency.cpp")
+        "Term 3. Object-Oriented Programming/lab4/AgentLib/agency.cpp"
+        "Term 3. Object-Oriented Programming/lab4/AgentLib/table.cpp")
 add_executable(GoogleTest ${SOURCE_FILES})
 target_link_libraries(GoogleTest gtest)

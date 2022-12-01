@@ -2,6 +2,12 @@
 // Created by USER on 07.11.2022.
 //
 
+/*!
+    \file
+    \brief Header with realisation of Agency classes
+
+    This file has realisation of parent Agency class' and three child classes' methods, defined in agency.h.
+*/
 #include "agency.h"
 #include <utility>
 
@@ -122,11 +128,12 @@ namespace agencies {
     }
 
     std::ostream& Printing::printInfo(std::ostream &os) const {
-        return os << this->getInfo();
+        return os << getInfo();
     }
 
     std::istream& Printing::learnInfo(std::istream &is) {
-        return is >> profile >> license >> place >> type >> period >> printrun;
+        type = printing;
+        return is >> profile >> license >> place >> period >> printrun;
     }
 
     bool Printing::isEqual(const agencies::Agency *b) const {
@@ -163,7 +170,8 @@ namespace agencies {
     }
 
     std::istream& Telecompany::learnInfo(std::istream &is) {
-        return is >> profile >> license >> place >> type >> frequency;
+        type = telecompany;
+        return is >> profile >> license >> place >> frequency;
     }
 
     bool Telecompany::isEqual(const agencies::Agency *b) const {
@@ -274,7 +282,8 @@ namespace agencies {
     }
 
     std::istream& Radio::learnInfo(std::istream &is) {
-        is >> profile >> license >> place >> type >> amount;
+        type = radio;
+        is >> profile >> license >> place >> amount;
         if (amount > 3 || amount < 1) {
             throw std::range_error(" amount must be from [1; 3]");
         }
