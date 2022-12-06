@@ -63,6 +63,11 @@ namespace agencies {
         + getPrintableType(type);
     }
 
+    Agency &Agency::banLicense() {
+        license = 0;
+        return *this;
+    }
+
     std::ostream& operator <<(std::ostream& os, const Agency& ag) {
         return ag.printInfo(os);
     }

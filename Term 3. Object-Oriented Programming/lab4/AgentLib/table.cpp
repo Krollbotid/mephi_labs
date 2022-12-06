@@ -61,12 +61,12 @@ namespace tables {
         return *this;
     }
 
-    bool Table::insert(const std::string &s, const agencies::Agency *f) {
+    bool Table::insert(const std::string &s, const agencies::Agency &f) {
         bool res = false;
         auto p = agencies.find(s);
         if (p == agencies.end()) {
             std::pair<std::map<const std::string, agencies::Agency *>::iterator, bool> pp =
-                    agencies.insert(std::make_pair(s, f->clone()));
+                    agencies.insert(std::make_pair(s, f.clone()));
             if (!pp.second)
                 throw std::range_error("can't insert new item into map");
             res = true;
@@ -74,13 +74,13 @@ namespace tables {
         return res;
     }
 
-    bool Table::replace(const std::string &s, const agencies::Agency *f)
+    bool Table::replace(const std::string &s, const agencies::Agency &f)
     {
         bool res = false;
         auto p = agencies.find(s);
         if (p != agencies.end()){
             delete p->second;
-            p->second = f->clone();
+            p->second = f.clone();
             res = true;
         }
         return res;

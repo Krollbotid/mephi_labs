@@ -62,6 +62,7 @@ namespace agencies {
         std::string getProfile() const;
         std::string getPlace() const;
         long long getLicense() const;
+        Agency& banLicense();
         friend std::ostream& operator <<(std::ostream& os, const agencies::Agency& src);
         friend std::istream& operator >>(std::istream& is, agencies::Agency& dest);
         friend bool operator ==(const agencies::Agency& first, const agencies::Agency& second);

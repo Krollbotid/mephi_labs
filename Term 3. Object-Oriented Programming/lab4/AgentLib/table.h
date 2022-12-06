@@ -64,18 +64,18 @@ namespace tables {
 	        \brief insert into table
 
 	        \param [in] s - name of inserting Agency.
-            \param [in] ag - pointer to inserting Agency.
+            \param [in] ag - reference to inserting Agency.
             \return true if successfully inserted, false if there already is Agency with that name.
         */
-        bool insert(const std::string &s, const agencies::Agency *ag);
+        bool insert(const std::string &s, const agencies::Agency &ag);
         /*!
 	        \brief replace Agency in table
 
 	        \param [in] s - name of replacing Agency.
-            \param [in] ag - pointer to new Agency.
+            \param [in] ag - reference to new Agency.
             \return true if successfully replaced, false if there already is Agency with that name.
         */
-        bool replace(const std::string &s, const agencies::Agency *ag);
+        bool replace(const std::string &s, const agencies::Agency &ag);
         /*!
 	        \brief remove from table
 
