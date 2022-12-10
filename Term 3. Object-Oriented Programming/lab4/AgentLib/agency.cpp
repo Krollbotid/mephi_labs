@@ -203,7 +203,7 @@ namespace agencies {
     }
 
     // Radio:
-    Radio::Radio(const std::vector<FrqDesc>& newpairs): Agency() {
+    Radio::Radio(const myVec::vector<FrqDesc>& newpairs): Agency() {
         if (newpairs.size() > 3) {
             throw std::range_error("Too many pairs put in constructor");
         }
@@ -217,7 +217,7 @@ namespace agencies {
         type = radio;
     }
 
-    Radio::Radio(const std::string &prof, const std::string &pl, const long long &lic, const std::vector<FrqDesc> &newpairs):
+    Radio::Radio(const std::string &prof, const std::string &pl, const long long &lic, const myVec::vector<FrqDesc> &newpairs):
         Agency(prof, pl, lic, radio) {
             if (newpairs.size() > 3) {
                 throw std::range_error("Too many pairs put in constructor");
@@ -231,7 +231,7 @@ namespace agencies {
             }
     }
 
-    Radio::Radio(const Agency &ag, const std::vector<FrqDesc> &newpairs): Agency(ag) {
+    Radio::Radio(const Agency &ag, const myVec::vector<FrqDesc> &newpairs): Agency(ag) {
         if (newpairs.size() > 3) {
             throw std::range_error("Too many pairs put in constructor");
         }
@@ -249,15 +249,15 @@ namespace agencies {
         return new Radio(*this);
     }
 
-    std::vector <FrqDesc> Radio::getPairs() const {
-        std::vector <FrqDesc> ans;
+    myVec::vector <FrqDesc> Radio::getPairs() const {
+        myVec::vector <FrqDesc> ans;
         for (const auto & pair : pairs) {
             ans.push_back(pair);
         }
         return ans;
     }
 
-    Radio &Radio::setPairs(std::vector<FrqDesc> newPairs) {
+    Radio &Radio::setPairs(myVec::vector<FrqDesc> newPairs) {
         if (newPairs.size() > 3) {
             throw std::range_error("Too many pairs put in constructor");
         }

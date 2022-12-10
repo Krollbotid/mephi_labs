@@ -26,7 +26,7 @@ TEST(AgenciesConstructor, DefaultConstructor) {
     ASSERT_EQ(agencies::telecompany, c.getType());
     ASSERT_EQ(1, c.getFrequency());
     agencies::Radio d;
-    std::vector <agencies::FrqDesc> vec = d.getPairs();
+    myVec::vector <agencies::FrqDesc> vec = d.getPairs();
     agencies::FrqDesc biba;
     for (int i = 0; i < 3; i++) {
         ASSERT_EQ(biba, vec[i]);
@@ -58,7 +58,7 @@ TEST(AgenciesConstructor, InitialConstructor) {
     ASSERT_EQ(346, telecompany3.getLicense());
     ASSERT_STREQ("Place2", telecompany3.getPlace().c_str());
     agencies::FrqDesc frqDesc1(5, 6, 7), frqDesc2(8, 9, 10), frqDescDef;
-    std::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
+    myVec::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
     agencies::Radio radio1(vec), radio2(ag), radio3(prof, pl, lic);
     ASSERT_EQ(vec, radio1.getPairs());
     ASSERT_EQ(agencies::radio, radio1.getType());
@@ -78,7 +78,7 @@ TEST(AgenciesFuncs, Setters) {
     ASSERT_EQ(3, printing1.getPrintrun());
     agencies::Radio radio1;
     agencies::FrqDesc frqDesc1(5, 6, 7), frqDesc2(8, 9, 10), frqDescDef;
-    std::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
+    myVec::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
     radio1.setPairs(vec);
     ASSERT_EQ(vec, radio1.getPairs());
 }
@@ -92,7 +92,7 @@ TEST(AgenciesFuncs, OtherFuncs) {
     ASSERT_EQ(true, telecompany1 == telecompany2);
     ASSERT_STREQ("Profile: Profile1 License: №345 Place: Place1 Type: telecompany Frequency: 4.000000", telecompany1.getInfo().c_str());
     agencies::FrqDesc frqDesc1(5, 6, 7), frqDesc2(8, 9, 10), frqDescDef;
-    std::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
+    myVec::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
     agencies::Radio radio1(ag, vec), radio2(ag, vec);
     ASSERT_EQ(true, radio1 == radio2);
     ASSERT_STREQ("Profile: Profile1 License: №345 Place: Place1 Type: radio FrqDesc №1 Frequency: 5.000000 "
@@ -108,7 +108,7 @@ TEST(TableAll, TableAll) {
     auto printing1 = new agencies::Printing(2, 3);
     auto telecompany1 = new agencies::Telecompany(ag, 4);
     agencies::FrqDesc frqDesc1(5, 6, 7), frqDesc2(8, 9, 10), frqDescDef;
-    std::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
+    myVec::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
     auto radio1 = new agencies::Radio(vec);
     ASSERT_STREQ("", table1.printTable().c_str());
     table1.insert("PrintingName", printing1);

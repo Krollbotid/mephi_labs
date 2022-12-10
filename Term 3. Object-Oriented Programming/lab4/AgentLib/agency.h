@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "./../myvector/myVector.h"
 
 namespace agencies {
     /// Set of types of agencies
@@ -146,12 +147,12 @@ namespace agencies {
         virtual std::istream& learnInfo(std::istream& is);
         virtual bool isEqual(const Agency* secPtr) const;
     public:
-        Radio(const std::vector <FrqDesc>& newpairs = {});
-        Radio(const std::string &prof, const std::string &pl, const long long &lic, const std::vector <FrqDesc> &newpairs = {});
-        Radio(const Agency &ag, const std::vector <FrqDesc> &newpairs = {});
+        Radio(const myVec::vector <FrqDesc>& newpairs = {});
+        Radio(const std::string &prof, const std::string &pl, const long long &lic, const myVec::vector <FrqDesc> &newpairs = {});
+        Radio(const Agency &ag, const myVec::vector <FrqDesc> &newpairs = {});
         virtual Agency *clone() const;
-        std::vector <FrqDesc> getPairs() const;
-        Radio& setPairs(std::vector <FrqDesc> newPairs);
+        myVec::vector <FrqDesc> getPairs() const;
+        Radio& setPairs(myVec::vector <FrqDesc> newPairs);
         std::string getInfo() const;
     };
 }
