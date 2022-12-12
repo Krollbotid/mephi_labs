@@ -41,42 +41,44 @@ namespace myVec {
         vector(): capacity(0), current(0), arr(nullptr) {}
 
         vector(const vector<T>& v): current(v.current), capacity(v.capacity) {
-            delete[] arr;
             arr = new T[capacity];
             T *ptr = arr, *ptr2 = v.arr;
             for (size_type i = 0; i < current; ++i) {
-                *ptr(*ptr2);
+                *ptr = *ptr2;
                 ++ptr;
                 ++ptr2;
             }
         }
 
         explicit vector(size_type& sz, const T& val = T()): capacity(sz), current(sz) {
-            delete[] arr;
             arr = new T[sz];
             T *ptr = arr;
             for (size_type i = 0; i < sz; ++i) {
-                *ptr(val);
+                *ptr = val;
             }
         }
-        vector(std::initializer_list <T>& l): capacity(0), current(0) {
-            for (auto i = l.begin(); i < l.end(); ++i) {
-                push_back(l[i]);
+        vector(const std::initializer_list <T> &l): capacity(l.size() - l.size() % adder + adder), current(l.size()) {
+            arr = new T[capacity];
+            T *ptr = arr;
+            for (auto &element : l) {
+                *ptr = element;
+                ++ptr;
             }
         }
         //modify
         void push_back(const T &obj) {
             if (current == capacity) {
-                T *narr = new T[capacity + adder], *nptr = narr, *ptr = arr;
+                capacity += adder;
+                T* narr = new T[capacity], *nptr = narr, *ptr = arr;
                 for (size_type i = 0; i < current; i++) {
+                    (*nptr) = (*ptr);
                     ++nptr;
-                    (*nptr)(*ptr);
                     ++ptr;
                 }
                 delete[] arr;
                 arr = narr;
             }
-            arr[++current](obj);
+            arr[current++] = obj;
         }
         void pop_back() {
             delete arr[current];
@@ -107,7 +109,7 @@ namespace myVec {
             return current;
         }
 
-        friend bool operator ==(vector& l, vector& r) {
+        friend bool operator ==(const vector& l, const vector& r) {
             if (l.current != r.current || r.capacity != r.capacity) {
                 return false;
             }

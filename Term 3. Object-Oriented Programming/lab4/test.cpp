@@ -105,30 +105,27 @@ TEST(TableAll, TableAll) {
     tables::Table table1;
     ASSERT_STREQ("", table1.printTable().c_str());
     agencies::Agency ag("Profile1", "Place1", 345, agencies::radio);
-    auto printing1 = new agencies::Printing(2, 3);
-    auto telecompany1 = new agencies::Telecompany(ag, 4);
+    agencies::Printing printing1(2, 3);
+    agencies::Telecompany telecompany1(ag, 4);
     agencies::FrqDesc frqDesc1(5, 6, 7), frqDesc2(8, 9, 10), frqDescDef;
     myVec::vector <agencies::FrqDesc> vec = {frqDesc1, frqDesc2, frqDescDef};
-    auto radio1 = new agencies::Radio(vec);
+    agencies::Radio radio1(vec);
     ASSERT_STREQ("", table1.printTable().c_str());
     table1.insert("PrintingName", printing1);
     table1.insert("TelecompanyName", telecompany1);
     table1.insert("RadioName", radio1);
-    std::string s = "Name: PrintingName " + printing1->getInfo() + "\n" + "Name: RadioName " + radio1->getInfo() + "\n"
-            + "Name: TelecompanyName " + telecompany1->getInfo() + "\n";
+    std::string s = "Name: PrintingName " + printing1.getInfo() + "\n" + "Name: RadioName " + radio1.getInfo() + "\n"
+            + "Name: TelecompanyName " + telecompany1.getInfo() + "\n";
     ASSERT_STREQ(s.c_str(), table1.printTable().c_str());
     tables::Table table2(table1), table3;
     table3 = table1;
     ASSERT_STREQ(s.c_str(), table2.printTable().c_str());
     ASSERT_STREQ(s.c_str(), table3.printTable().c_str());
-    std::string g = "Name: TelecompanyName " + telecompany1->getInfo();
+    std::string g = "Name: TelecompanyName " + telecompany1.getInfo();
     ASSERT_STREQ(g.c_str(), tables::printPair(*(table1.find("TelecompanyName"))).c_str());
     table3.remove("RadioName");
-    s = "Name: PrintingName " + printing1->getInfo() + "\n" + "Name: TelecompanyName " + telecompany1->getInfo() + "\n";
+    s = "Name: PrintingName " + printing1.getInfo() + "\n" + "Name: TelecompanyName " + telecompany1.getInfo() + "\n";
     ASSERT_STREQ(s.c_str(), table3.printTable().c_str());
-    delete telecompany1;
-    delete radio1;
-    delete printing1;
 }
 
 int main()
